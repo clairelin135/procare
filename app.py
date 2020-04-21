@@ -3,7 +3,7 @@
 import os
 import json
 import pyrebase
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template, url_for
 from firebase_admin import credentials, firestore, initialize_app
 
 # config = {
@@ -25,6 +25,7 @@ from firebase_admin import credentials, firestore, initialize_app
 
 # Initialize Flask App
 app = Flask(__name__)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 # Initialize Firestore DB
 cred = credentials.Certificate('key.json')
 default_app = initialize_app(cred)
@@ -105,9 +106,12 @@ def create():
 def hello_world(): 
     return 'Hello World'
 
-@app.route('/hello/<name>')
-def hello_whoever(name):
-    return 'Hello ' + name
+@app.route('/employee/<id>')
+def employee(id):
+    data = {
+        'name': 'Claire',
+    }
+    return render_template("employee.html", data=data)
   
 # main
 port = int(os.environ.get('PORT', 8080))

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block name %}{{data.name}}{% endblock %}
+
+{% block html_head %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard.css') }}"/>
+{% endblock %}
+
+{% block content %}
+  <div>
+    <h1>Welcome back, {{data.name}}!<h1>
+    <h3 class="mt2">Some blurb about your progress</h3>
+  </div>
+  <div class="mt4 flex flex-row">
+    <div class="dashboard mr2">
+      <div class="flex bg-white pa4">
+        <h2>Dashboard</h2>
+      </div>
+    </div>
+    <div class="messages ml2">
+        <div class="flex bg-white pa4">
+            <h2>Messages</h2>
+          </div>
+    </div>
+  </div>
+  
+{% endblock %}
