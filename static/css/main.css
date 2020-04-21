@@ -34,6 +34,10 @@ html, body, div, span, applet, object, iframe,
   background-color: #F4F4F4;
 }
 
+.bg-blue {
+  background-color: #55A8F8;
+}
+
 h1 {
   font-family: 'Montserrat', sans-serif;
   font-weight: 700;
@@ -50,5 +54,4 @@ h3 {
   font-family: 'Montserrat', sans-serif;
   font-weight: 500;
   font-size: 14px;
-  color: darkgray;
 }

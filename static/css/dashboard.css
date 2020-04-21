@@ -1,7 +1,11 @@
 .messages {
-    flex: 1;
+  flex: 1;
 }
 
 .dashboard {
-    flex: 2;
+  flex: 2;
+}
+
+.tile {
+  flex: 1;
 }

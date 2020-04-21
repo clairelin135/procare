@@ -108,10 +108,19 @@ def hello_world():
 
 @app.route('/employee/<id>')
 def employee(id):
-    data = {
-        'name': 'Claire',
-    }
-    return render_template("employee.html", data=data)
+    collection = "employees"
+    document = "employee"
+
+    doc_ref = db.collection(collection).document(document+str(id))
+    doc = doc_ref.get()
+
+    if doc.exists:
+        doc = doc.to_dict()
+        doc["water_percentage"] = round(round(doc["water_consumed"]/doc["water_dv"], 2)*100)
+        doc["focus_percentage"] = round(round(doc["time_focused"]/120, 2)*100)
+        return render_template("employee.html", data=doc)
+    else:
+        return f"An Error Occured: {e}"
   
 # main
 port = int(os.environ.get('PORT', 8080))
