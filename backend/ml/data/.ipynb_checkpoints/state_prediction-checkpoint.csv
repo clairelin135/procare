@@ -1,0 +1,51 @@
+ID,age,gender,body_fat_percentage,height,weight,num_breaks,num_task_pending,average_task_completion_delay,calories_eaten,morning push percentage,afternoon push percentage,evening push percentage,git_avg_push_time_difference,average_chat_tone,ergonomic_risk_rating,number of times standing,minutes_worked_out,average_heart_rate,traffic condition,chat-words,location,workplace temperature,weather,entry time,exit time,stock_ticker,stock,hours,DEPRESSED?,S.A.D.?,LOMBAGO,CARPAL TUNNEL
+1,28,male,18,75,172,2,4,3,2001,0.7307736685,0.1433532516,0.1258730799,287,Angry,75,10,0,100,red,"tired, overlooked",SF,69,Rainy,7,4,GOOG,35%,10,1,0,1,0
+2,34,female,25,69,160,2,5,3,1685,0.9859863156,0.009755635493,0.004258048867,19,Angry,28,16,30,90,red,"stressed, tired",SF,70,overcast,8,8,GOOG,-10%,8,0,0,0,0
+3,53,female ,31,65,125,2,3,11,2249,0.3018217194,0.6534050425,0.04477323816,238,Angry,81,15,60,80,yellow,"drained, fatigue",NYC,72,snowing,9,6,GOOG,6%,8,0,1,0,0
+4,66,male,36,73,152,2,2,1,2754,0.5986704317,0.2307720134,0.1705575549,297,Angry,84,11,120,60,red,"fatigued, disheartened",Indianapolis,72,overcast,7,6,GOOG,20%,8,1,0,0,0
+5,54,male,30,75,195,2,5,9,2479,0.43110678,0.397598164,0.171295056,160,Happy,45,17,45,69,yellow,"sad, tired",Atlanta,69,sunny,6,5,GOOG,-12%,8,0,0,0,0
+6,32,female,22,72,174,3,2,4,2281,0.9352631132,0.01871103515,0.04602585166,164,Happy,81,15,0,90,green,"overlooked, annoyed",SF,69,rainy,9,7,GOOG,-13%,8,1,1,0,0
+7,27,female ,31,66,150,1,4,5,1793,0.9854279884,0.0007314207882,0.01384059078,297,Angry,40,20,0,90,red,"tired, sad",NYC,69,Rainy,9,8,GOOG,-10%,7,1,1,0,1
+8,44,male,36,71,163,3,4,9,2350,0.1060344255,0.7038468022,0.1901187723,263,Angry,43,12,30,86,yellow,uncomfortable,Las Vegas,70,overcast,9,7,GOOG,10%,12,1,0,0,1
+9,47,male,32,73,198,0,5,7,1952,0.4114941619,0.4968613939,0.09164444418,200,Angry,51,15,0,70,red,"bipolar, angry",LA,65,overcast,6,6,GOOG,20%,11,1,0,0,1
+10,46,female,20,70,144,0,1,1,2165,0.6397665416,0.1660429441,0.1941905143,129,Angry,46,16,0,70,yellow,"drained, sore",LA,65,overcast,8,8,GOOG,-31%,10,0,0,1,1
+11,43,female ,36,74,155,0,5,11,1558,0.08918780974,0.2633077218,0.6475044685,125,Angry,33,11,0,100,red,"stiff, in pain",LA,68,sunny,8,6,GOOG,-21%,10,0,0,1,0
+12,42,male,29,67,189,0,5,5,2106,0.1629821702,0.4601131287,0.376904701,265,Happy,19,18,30,100,green,"unhappy, overlooked",Atlanta,67,overcast,6,6,GOOG,20%,9,1,0,0,0
+13,45,male,38,69,162,0,2,3,2322,0.5040439363,0.3596576568,0.1362984069,12,Happy,79,17,60,67,green,"fatigued, sore",SF,73,overcast,7,4,GOOG,16%,9,1,0,1,0
+14,29,female,39,67,130,2,4,6,1414,0.5201100545,0.1156549269,0.3642350185,185,Happy,72,11,120,67,yellow,"overlooked, annoyed",NYC,74,rainy,7,5,GOOG,19%,9,0,1,0,1
+15,29,female ,27,69,119,2,3,1,1636,0.8637141654,0.1321397195,0.004146115075,115,Happy,63,11,45,71,red,"okay, drained",Austin,60,sunny,7,6,GOOG,-31%,9,0,0,1,0
+16,31,male,32,70,172,2,2,5,2279,0.3474445136,0.1455743836,0.5069811028,16,Angry,79,17,0,71,red,"tired, uncomfortable",El Paso,59,sunny,7,7,GOOG,23%,9,0,0,1,0
+17,30,male,23,71,160,2,5,7,2464,0.1779660341,0.6774704534,0.1445635125,96,Angry,38,15,0,100,yellow,"bipolar, tired",Scottsdale,62,sunny,7,7,GOOG,21%,9,1,0,0,0
+18,31,female,29,70,153,3,2,11,1448,0.4621788119,0.00205427026,0.5357669179,85,Angry,84,15,0,100,red,"overlook, overworked",Denver,65,Rainy,9,6,GOOG,20%,9,1,0,0,0
+19,32,female ,34,70,151,0,4,7,2071,0.6787651152,0.07994477903,0.2412901058,275,Angry,12,13,0,100,yellow,"sore, angry",Denver,65,overcast,9,6,GOOG,-20%,9,0,0,1,0
+20,34,male,29,75,183,0,2,11,2118,0.694000543,0.2298664138,0.07613304322,263,Angry,44,13,0,98,yellow,"stiff, irritated",Colorado Springs,65,snowing,9,6,GOOG,-19%,8,1,0,0,0
+21,34,male,20,65,219,1,3,5,2465,0.3943700004,0.498513916,0.1071160837,111,Happy,57,19,60,89,green,"unhappy, okay",Pheonix,65,overcast,9,6,GOOG,-10%,8.5,1,1,0,0
+22,35,female,29,63,127,1,5,9,2095,0.1592084525,0.03949010392,0.8013014436,273,Happy,83,19,60,68,yellow,"okay, overlooked",Indianapolis,71,sunny,8,5,GOOG,-28%,7.5,0,0,0,0
+23,55,female ,20,69,110,0,1,8,2270,0.03042405336,0.6757014368,0.2938745098,274,Happy,66,16,60,65,red,"stressed, overworked",Philidelphia,68,overcast,8,5,GOOG,15%,8,0,1,0,0
+24,59,male,38,65,165,2,1,4,2723,0.9726443736,0.01399368305,0.0133619434,249,Happy,10,14,45,65,yellow,"tired, overworked",Washington DC,68,overcast,6,5,GOOG,14%,9,0,1,0,0
+25,68,male,36,70,177,2,3,9,2781,0.3261682562,0.3932486589,0.2805830849,171,Angry,19,9,45,65,yellow,"sad, sleepy",Seatle,68,rainy,7,5,GOOG,13%,9.5,1,0,1,1
+26,70,female,20,67,130,2,5,6,1543,0.1056592911,0.18186355,0.7124771589,141,Angry,62,16,45,65,green,"good, motivated",Seatle,68,rainy,7,6,GOOG,16%,9.5,0,0,0,0
+27,62,female ,33,66,121,2,2,7,2080,0.2226657692,0.08368217635,0.6936520544,47,Angry,55,18,30,70,yellow,"happy, tired",SF,68,rainy,8,6,GOOG,-32%,10,0,0,1,0
+28,52,male,22,66,172,2,3,6,2494,0.451698965,0.229356649,0.318944386,63,Angry,82,10,60,70,red,"good, fatigued",Philidelphia,75,sunny,9,3,GOOG,-27%,10,1,0,0,0
+29,53,male,23,65,214,1,3,4,2305,0.432983927,0.1207381916,0.4462778814,111,Happy,62,11,120,60,yellow,"good, happy",Washington DC,64,rainy,7,4,GOOG,-17%,10,0,0,0,0
+30,51,female,20,73,114,1,1,8,2486,0.1558803344,0.5218563215,0.3222633441,79,Happy,64,11,45,70,red,"happy, stiff",Pheonix,64,Rainy,8,5,GOOG,-18%,9,0,0,0,1
+31,29,female ,35,65,127,1,1,2,1923,0.9754143867,0.01010131579,0.01448429753,247,Happy,26,10,0,85,yellow,"irritated, okay",Colorado Springs,65,overcast,10,5,GOOG,19%,9,0,1,0,1
+32,30,male,19,73,218,1,2,11,2829,0.2302347846,0.5814598258,0.1883053896,265,Angry,59,13,45,78,green,"okay, sore",Seatle,65,snowing,8,5,GOOG,20%,9,0,1,0,1
+33,32,male,37,68,179,4,2,1,2191,0.5069379557,0.2588545907,0.2342074536,136,Angry,70,16,45,76,yellow,"good, capable",Washington DC,67,overcast,7,6,GOOG,7%,8,0,1,0,0
+34,33,female,37,71,152,3,3,10,2331,0.3193465599,0.6764953001,0.004158139994,247,Angry,79,15,45,75,green,"in pain, okay",Philidelphia,68,sunny,8,5,GOOG,-4%,9.5,0,0,0,1
+35,43,female ,25,64,152,3,1,9,2485,0.6653002429,0.2432283977,0.09147135942,45,Angry,51,16,30,74,green,"stiff, overworked",Washington DC,68,snowing,8,4,GOOG,-5%,8,0,0,1,0
+36,45,male,23,66,176,3,1,7,2890,0.9372647658,0.02940446496,0.03333076928,184,Happy,52,16,0,74,yellow,"overworked, okay",Seatle,69,overcast,8,5,GOOG,-14%,8,0,0,1,0
+37,65,male,22,68,214,3,1,7,2724,0.3374178292,0.05693367033,0.6056485005,129,Happy,66,12,30,74,yellow,"overworked, stiff",El Paso,69,snowing,9,6,GOOG,14%,8,0,0,1,0
+38,43,female,35,72,111,3,1,6,2418,0.3792917021,0.1141884933,0.5065198046,193,Happy,37,18,30,69,yellow,"sore, angry",Philidelphia,69,overcast,9,7,GOOG,5%,10,1,1,1,0
+39,45,female ,39,66,127,2,3,7,2195,0.7656746441,0.1037088475,0.1306165084,265,Happy,57,15,30,73,red,"tired, okay",Austin,70,rainy,8,6,GOOG,7%,10,0,1,0,0
+40,54,male,19,72,145,2,3,4,2057,0.9631517235,0.02963734926,0.007210927269,97,Happy,22,13,60,69,yellow,"happy, energized",Washington DC,70,Rainy,8,5,GOOG,9%,11,1,0,0,0
+41,56,male,33,74,151,2,2,8,2438,0.5814058037,0.03210768773,0.3864865086,236,Happy,43,20,120,69,green,"tired, okay",Austin,70,overcast,9,7,GOOG,9%,9.5,0,1,0,0
+42,49,female,18,73,127,2,1,2,1486,0.9928486723,0.00003318763111,0.007118140112,247,Happy,22,14,45,69,red,"fatigued, overworked",Seatle,70,snowing,9,8,GOOG,9%,9.5,0,0,0,0
+43,49,female ,24,66,140,1,1,10,1828,0.3190428433,0.4661682453,0.2147889114,60,Happy,55,16,30,69,green,"happy, overworked",Austin,72,overcast,9,6,GOOG,9%,9.5,1,0,1,0
+44,59,male,22,69,155,1,3,5,2855,0.413077754,0.1418817561,0.4450404899,113,Happy,20,15,30,64,red,"overlooked, overworked",Pheonix,72,sunny,8,5,GOOG,-8%,9.5,0,0,0,0
+45,50,male,34,64,200,1,3,6,2698,0.270672013,0.2916953744,0.4376326126,92,Happy,22,12,0,65,green,"okay, bored",LA,67,sunny,9,4,GOOG,-3%,9,1,0,0,0
+46,50,female,37,65,150,4,1,2,2096,0.1583476176,0.4392046128,0.4024477696,124,Happy,60,14,30,65,red,"uncomfortable, in pain",Pheonix,72,Rainy,8,5,GOOG,-4%,9,1,0,0,1
+47,60,female ,38,69,119,4,2,1,1643,0.9479272955,0.03673257494,0.01534012954,65,Happy,51,12,60,65,yellow,"happy, bored",Philidelphia,67,overcast,6,6,GOOG,4%,9,0,0,0,0
+48,48,male,23,68,218,4,2,5,2705,0.6530895753,0.2229802268,0.1239301979,137,Happy,19,12,120,62,red,"unfulfilled, tired",LA,72,sunny,8,5,GOOG,-10%,9,0,1,0,0
+49,47,female,37,65,140,4,3,4,1957,0.1381135294,0.6992514599,0.1626350107,245,Happy,71,11,45,76,red,"okay, stiff",LA,68,overcast,9,4,GOOG,10%,9,0,1,0,1
+50,24,male,35,63,195,5,2,3,2554,0.3192117926,0.5929898385,0.08779836888,216,Happy,51,16,0,76,green,"okay, sore",Philidelphia,68,sunny,9,5,GOOG,15%,8,0,0,1,1
