@@ -29,7 +29,7 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 # Initialize Firestore DB
 cred = credentials.Certificate('key.json')
 default_app = initialize_app(cred)
-db = firestore.client() 
+db = firestore.client()
 
 # given collection, and document, adds an name/age entry into db
 @app.route('/add', methods=['POST'])
@@ -51,7 +51,7 @@ def create_employee():
     except Exception as e:
         return f"An Error Occured: {e}"
 
-# returns the requested 
+# returns the requested
 # json req keys: id, collection, document, field
 @app.route('/list', methods=['GET'])
 def read_employee_info():
@@ -106,14 +106,14 @@ def delete_employee():
         id = body['id']
         doc_ref = db.collection('employees').document('employee'+str(id))
         doc_ref.delete()
-        
+
         return jsonify({"success": True}), 200
     except Exception as e:
         return f"An Error Occured: {e}"
 
-@app.route('/') 
-# ‘/’ URL is bound with hello_world() function. 
-def hello_world(): 
+@app.route('/')
+# ‘/’ URL is bound with hello_world() function.
+def hello_world():
     return 'Hello World'
 
 @app.route('/employee/<id>')
@@ -131,7 +131,25 @@ def employee(id):
         return render_template("employee.html", data=doc)
     else:
         return f"An Error Occured: {e}"
-  
+
+@app.route('/employer')
+def employer():
+    # collection = "employers"
+    # document = "2020-04-16"
+    #
+    # doc_ref = db.collection(collection).document(document)
+    # doc = doc_ref.get()
+    #
+    # dunno what the real data will actually
+    doc = {'emotion-percentage': '65%',
+            'product-percentage':'75%',
+            'nutrition-percentage': '85%',
+            'attendance': 300,
+            'late': 10,
+            'absent': 5}
+
+    return render_template("employer.html", data=doc)
+
 # main
 port = int(os.environ.get('PORT', 8080))
 if __name__ == '__main__':
