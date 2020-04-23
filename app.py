@@ -5,6 +5,9 @@ import json
 import pyrebase
 from flask import Flask, request, jsonify, render_template, url_for
 from firebase_admin import credentials, firestore, initialize_app
+from bokeh.plotting import figure
+from bokeh.models import DatetimeTickFormatter
+from bokeh.embed import components
 
 # config = {
 #     "apiKey": "AIzaSyBdvsfqF_yfU5uvbu6tJxqAuU_jZQw86DQ",
@@ -121,16 +124,35 @@ def employee(id):
     collection = "employees"
     document = "employee"
 
-    doc_ref = db.collection(collection).document(document+str(id))
+    doc_ref = db.collection(collection).document(str(id))
     doc = doc_ref.get()
 
     if doc.exists:
         doc = doc.to_dict()
-        doc["water_percentage"] = round(round(doc["water_consumed"]/doc["water_dv"], 2)*100)
-        doc["focus_percentage"] = round(round(doc["time_focused"]/120, 2)*100)
-        return render_template("employee.html", data=doc)
+        doc["water_percentage"] = round(round(120/600, 2)*100)
+        doc["focus_percentage"] = round(round(55/120, 2)*100)
+
+        break_duration_len = min(32, len(doc["break_durations"]))
+        x = []
+        y = []
+        for b in doc["break_durations"][-break_duration_len:]:
+            x.append(b["time"])
+            y.append(sum(b["data"]))
+
+        p = figure(plot_width=550, plot_height=300)
+
+        # add both a line and circles on the same plot
+        p.line(x, y, line_width=2, line_color="#8CCFBB")
+        p.toolbar_location = None
+        p.xaxis.axis_label = "Time"
+        p.xaxis.formatter = DatetimeTickFormatter(hourmin = ['%H:%M'])
+        p.yaxis.axis_label = "Minutes spent walking/standing"
+
+        script, div = components(p)
+
+        return render_template("employee.html", data=doc, div=div, script=script)
     else:
-        return f"An Error Occured: {e}"
+        return f"User does not exist"
 
 @app.route('/employer')
 def employer():

@@ -4,6 +4,9 @@
 {% block html_head %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard.css') }}"/>
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/circle.css') }}"/>
+
+<link rel="stylesheet" href="https://cdn.bokeh.org/bokeh/release/bokeh-2.0.2.min.css" type="text/css" />
+<link rel="stylesheet" href="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.0.2.min.css" type="text/css" />
 {% endblock %}
 
 {% block content %}
@@ -42,7 +45,11 @@
         </div>
       </div>
       <div class="flex mt1 bg-white pa4 flex-column items-center">
-        <h2>Movement Today</h2>
+        <h2 class="mb3">Physical Activity Today</h2>
+        {{ div |safe }}
+        <script src="http://cdn.pydata.org/bokeh/release/bokeh-2.0.2.min.js"></script>
+        <script src="http://cdn.pydata.org/bokeh/release/bokeh-widgets-2.0.2.min.js"></script>
+        {{ script |safe }}
       </div>
     </div>
     <div class="messages ml2">
