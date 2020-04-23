@@ -9,3 +9,15 @@
 .tile {
   flex: 1;
 }
+
+.tree-container {
+  background-size: cover;
+  max-height: 500px;
+  background-position: center bottom;
+  background-image: url(/static/images/trees.png);
+  background-repeat: no-repeat;
+}
+
+.tree {
+  width: auto;
+}

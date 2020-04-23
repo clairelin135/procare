@@ -9,13 +9,15 @@
     <div class="container navbar">
       <div class="mw8 center">
         <div class="flex flex-row pa3 justify-between">
-          <div class="flex flex-row">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" class="logo"/>
-            <div class="flex flex-column justify-center mh3">
-              <h2 class="ttu">Procare</h2>
-              <h3 class="ttu">Workplace Wellness</h3>
+          <a href="/">
+            <div class="flex flex-row">
+              <img src="{{ url_for('static', filename='images/logo.png') }}" class="logo"/>
+              <div class="flex flex-column justify-center mh3">
+                <h2 class="ttu">Procare</h2>
+                <h3 class="ttu">Workplace Wellness</h3>
+              </div>
             </div>
-          </div>
+          </a>
           <div class="flex flex-row items-center">
             <div class="h2 w2 br4 bg-gray mr3"></div>
             <h3>{% block name %}{% endblock %}</h3>

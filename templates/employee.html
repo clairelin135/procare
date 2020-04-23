@@ -53,8 +53,18 @@
       </div>
     </div>
     <div class="messages ml2">
-      <div class="flex bg-white pa4">
-        <h2>Messages</h2>
+      <div class="flex flex-column bg-white">
+        <div class="pa4">
+          <h2>Messages</h2>
+        </div>
+        <div class="flex flex-column tree-container justify-between">
+          <div class="pa4">
+            <h3>You've earned 238 points<br/>this week!</h3>
+          </div>
+          <div class="flex flex-column justify-end items-end w-100 pr4 pb3">
+            <img src="{{ url_for('static', filename='images/solo-tree.png') }}" height="300px" class="tree"/>
+          </div>
+        </div>
       </div>
     </div>
   </div>

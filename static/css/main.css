@@ -20,6 +20,11 @@ html, body, div, span, applet, object, iframe,
  	font: inherit;
  	vertical-align: baseline;
  }
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
  
 .logo {
   width: 40px;
