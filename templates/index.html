@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block name %}{% endblock %}
+
+{% block html_head %}
+{% endblock %}
+
+{% block content %}
+<div class="flex flex-row">
+  <div class="flex flex-column bg-white pa4 mr2">
+    <h2 class="mb3">EMPLOYEES</h2>
+    {% for employee in employees %}
+      <a href="{{employee['route']}}">
+        <h3 class="underline">{{employee['name']}}</h3>
+      </a>
+    {% endfor %}
+  </div>
+  <div class="flex flex-column bg-white pa4 ml2">
+      <h2 class="mb3">EMPLOYERS</h2>
+      {% for employer in employers %}
+        <a href="{{employer['route']}}">
+          <h3 class="underline">{{employer['name']}}</h3>
+        </a>
+      {% endfor %}
+    </div>
+</div>
+{% endblock %}

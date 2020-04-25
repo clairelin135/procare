@@ -53,17 +53,27 @@
       <div class="flex flex-column bg-white">
         <div class="pa4">
           <h2>Messages</h2>
+          <form method="post">
+            <div class="flex flex-column mv3">
+              {% for field in form %}
+                <div class="flex flex-row justify-between mv1">
+                  <h3>{{field.label}}</h3>
+                  {{field}}
+                </div>
+              {% endfor %}
+            </div>
+            <h3><input type=submit value="Submit"></h3>
+          </form>
         </div>
         <div class="flex flex-column tree-container justify-between">
-          <div class="pa4">
-            <h3>You've earned 238 points<br/>this week!</h3>
+          <div class="pb4 ph4">
+            <h3>You've earned {{data["points"]}} points!</h3>
           </div>
           <div class="flex flex-column justify-end items-end w-100 pr4 pb3">
-            <img src="{{ url_for('static', filename='images/solo-tree.png') }}" height="300px" class="tree"/>
+            <img src="{{ url_for('static', filename='images/solo-tree.png') }}" height="{{data['tree_height']}}" class="tree"/>
           </div>
         </div>
       </div>
     </div>
   </div>
-  
 {% endblock %}

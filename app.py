@@ -3,11 +3,12 @@
 import os
 import json
 import pyrebase
-from flask import Flask, request, jsonify, render_template, url_for
+from flask import Flask, request, jsonify, render_template, url_for, redirect
 from firebase_admin import credentials, firestore, initialize_app
 from bokeh.plotting import figure
 from bokeh.models import DatetimeTickFormatter
 from bokeh.embed import components
+from wtforms import Form, BooleanField
 
 # config = {
 #     "apiKey": "AIzaSyBdvsfqF_yfU5uvbu6tJxqAuU_jZQw86DQ",
@@ -29,10 +30,19 @@ from bokeh.embed import components
 # Initialize Flask App
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
+
 # Initialize Firestore DB
 cred = credentials.Certificate('key.json')
 default_app = initialize_app(cred)
 db = firestore.client()
+
+# Initialize Firestore DB Constants
+EMPLOYER_COLLECTION = "employers"
+EMPLOYEE_COLLECTION = "employees"
+NUDGE_COLLECTION = "nudges"
+
+EMPLOYER_ROUTE = "/employer/"
+EMPLOYEE_ROUTE = "/employee/"
 
 # given collection, and document, adds an name/age entry into db
 @app.route('/add', methods=['POST'])
@@ -95,7 +105,6 @@ def update():
     except Exception as e:
         return f"An Error Occured: {e}"
 
-
 # delete an employee
 # json requires: id
 @app.route('/delete', methods=['GET'])
@@ -115,20 +124,73 @@ def delete_employee():
         return f"An Error Occured: {e}"
 
 @app.route('/')
-# ‘/’ URL is bound with hello_world() function.
-def hello_world():
-    return 'Hello World'
+def index():
+    employees = []
+    employers = []
 
-@app.route('/employee/<id>')
+    employee_docs = db.collection(EMPLOYEE_COLLECTION).stream()
+    for doc in employee_docs:
+        json_doc = doc.to_dict()
+        employee = {
+            "name": json_doc["name"],
+            "route": EMPLOYEE_ROUTE + str(doc.id)
+        }
+        employees.append(employee)
+
+    # employer_docs = db.collection(EMPLOYER_COLLECTION).stream()
+    # for doc in employer_docs:
+    #     json_doc = doc.to_dict()
+    #     employer = {
+    #         "name": json_doc["name"]
+    #         "id": doc.id
+    #     }
+    #     employers.append(employer)
+    
+    return render_template("index.html", employees=employees, employers=employers)
+
+class F(Form):
+    pass
+
+@app.route(EMPLOYEE_ROUTE + '<id>', methods=['GET', 'POST'])
 def employee(id):
-    collection = "employees"
-    document = "employee"
+    form = F(request.form)
+    if request.method == 'POST':
+        for (key, value) in form.data.items():
+            try:
+                doc_ref = db.collection(NUDGE_COLLECTION + "-1").document(key)
+                doc_ref.update({
+                    "sent": value,
+                    "responded": True
+                })
+                delattr(F, key)
+            except Exception as e:
+                return f"An Error Occured: {e}"
+        return redirect(request.url)
 
-    doc_ref = db.collection(collection).document(str(id))
+    doc_ref = db.collection(EMPLOYEE_COLLECTION).document(str(id))
     doc = doc_ref.get()
 
     if doc.exists:
         doc = doc.to_dict()
+
+        # Fetch nudges and add to document
+        nudges = []
+        point_count = 0
+        nudges_ref = db.collection(NUDGE_COLLECTION + "-1").stream()
+        for nudge in nudges_ref:
+            id = nudge.id
+            nudge = nudge.to_dict()
+            nudge["id"] = id
+            if nudge["responded"] == False: # Only display nudges that the user has not responded to
+                nudges.append(nudge)
+            elif nudge["sent"] == True: # User accepted the nudge
+                point_count += 1
+        doc["points"] = point_count
+        doc["tree_height"] = str(min(500, 150 + point_count * 50)) + "px"
+        
+        for nudge in nudges:
+            setattr(F, nudge["id"], BooleanField(label=nudge["nudge_question"]))
+
         doc["water_percentage"] = round(round(120/600, 2)*100)
         doc["focus_percentage"] = round(round(55/120, 2)*100)
 
@@ -150,11 +212,11 @@ def employee(id):
 
         script, div = components(p)
 
-        return render_template("employee.html", data=doc, div=div, script=script)
+        return render_template("employee.html", data=doc, div=div, script=script, form=form)
     else:
         return f"User does not exist"
 
-@app.route('/employer')
+@app.route(EMPLOYER_ROUTE + '<id>')
 def employer():
     # collection = "employers"
     # document = "2020-04-16"
