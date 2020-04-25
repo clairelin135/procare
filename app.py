@@ -153,8 +153,8 @@ class F(Form):
 
 @app.route(EMPLOYEE_ROUTE + '<id>', methods=['GET', 'POST'])
 def employee(id):
-    form = F(request.form)
     if request.method == 'POST':
+        form = F(request.form)
         for (key, value) in form.data.items():
             try:
                 doc_ref = db.collection(NUDGE_COLLECTION + "-1").document(key)
@@ -165,8 +165,10 @@ def employee(id):
                 delattr(F, key)
             except Exception as e:
                 return f"An Error Occured: {e}"
+        setattr(F, '_unbound_fields', [])
         return redirect(request.url)
 
+    form = F(request.form)
     doc_ref = db.collection(EMPLOYEE_COLLECTION).document(str(id))
     doc = doc_ref.get()
 
