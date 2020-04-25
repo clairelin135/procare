@@ -9,6 +9,7 @@ from bokeh.plotting import figure
 from bokeh.models import DatetimeTickFormatter
 from bokeh.embed import components
 from wtforms import Form, BooleanField
+import requests
 
 # config = {
 #     "apiKey": "AIzaSyBdvsfqF_yfU5uvbu6tJxqAuU_jZQw86DQ",
@@ -236,6 +237,57 @@ def employer():
             'absent': 5}
 
     return render_template("employer.html", data=doc)
+
+@app.route("/predict", methods=['GET'])
+def predict():
+    body = request.json
+    id = body['id']
+    doc_ref = db.collection(EMPLOYEE_COLLECTION).document(str(id))
+    doc = doc_ref.get()
+
+    inp = {
+        'ID':0, 
+        'age':21, 
+        'gender':"male", 
+        'body_fat_percentage':12, 
+        'height':169, 
+        'weight':200,
+        'num_breaks':5, 
+        'num_task_pending':234, 
+        'average_task_completion_delay':1000,
+        'calories_eaten':500, 
+        'morning push percentage':0.2,
+        'afternoon push percentage':0.6, 
+        'evening push percentage':0.2,
+        'git_avg_push_time_difference':10, 
+        'average_chat_tone':'Angry',
+        'ergonomic_risk_rating':5, 
+        'number of times standing':1,
+        'minutes_worked_out':0, 
+        'average_heart_rate':180, 
+        'traffic condition':'Red',
+        'chat-words':"bad", 
+        'location':"77494", 
+        'workplace temperature':"23", 
+        'weather':"rainy",
+        'entry time':3, 
+        'exit time':23, 
+        'stock_ticker':"GOOG", 
+        'stock':"-35%", 
+        'hours':40
+    }
+
+    if doc.exists or True:
+        # employee_m = doc.to_dict()
+        url = "https://us-central1-ieor185-274323.cloudfunctions.net/predictor2"
+        params = {
+            'inp': inp,
+            'name': 'depression'
+        }
+        r = requests.get(url, params)
+        return r
+    else:
+        return f"Employee id does not exist"
 
 # main
 port = int(os.environ.get('PORT', 8080))
