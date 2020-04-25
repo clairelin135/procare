@@ -10,8 +10,8 @@ class NudgePackage:
         self.nudge_time = nudge_time
         self.nudge_question = nudge_question
         self.nudge_response = "Response Goes Here"
-        self.responded = False
-        self.sent = False
+        self.response = None
+        self.displayed = False
 
     def send(self):
         cred = credentials.Certificate('ieor185-274323-e16b83ee9351.json')

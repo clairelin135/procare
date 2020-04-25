@@ -64,7 +64,6 @@ class Employee:
 
     def get_daily_stats(self):
         now = datetime.datetime.now()
-
         self.entrance_time.append({"time":now, "data":np.random.randint(3,11)})
         self.exit_time.append({"time":now, "data":np.random.randint(15,23)})
         self.traffic.append({"time":now, "data":self.traffic_constant[np.random.randint(0, len(self.traffic_constant))]})
@@ -76,14 +75,14 @@ class Employee:
         self.git_push_dist_morning.append({"time":now, "data":x})
         self.git_push_dist_afternoon.append({"time":now, "data":y})
         self.git_push_dist_evening.append({"time":now, "data":z})
+        self.avg_task_delay.append({"time":now, "data":np.random.randint(0, 24*60*7)})
+        self.num_task_pendings.append({"time":now, "data":np.random.randint(0,100)})
+
 
     
     def get_api_stats(self):
         now = datetime.datetime.now()
-
-        self.num_task_pendings.append({"time":now, "data":np.random.randint(0,100)})
-        self.avg_task_delay.append({"time":now, "data":np.random.randint(0, 24*60*7)})
-        self.git_push_time_difference.append({"time":now, "data":np.random.randint(5, 300)}) # Supposed to get from Git livetime
+        self.git_push_time_difference.append({"time":now, "data":np.random.randint(5, 15)}) # Supposed to get from Git livetime
         self.heart_rate.append({"time":now, "data":np.random.randint(60,180)})
         self.temperature.append({"time":now, "data":np.random.randint(50, 70)}) # Replace with Weather API
         self.stock_ytd.append({"time":now, "data":np.random.random() * (-1 * np.random.randint(0,2))})  # Replace this with Yahoo Finance API
@@ -104,24 +103,26 @@ class Employee:
 
     def store_employee_to_firebase(self):
         # Use a service account
-        cred = credentials.Certificate('ieor185-274323-e16b83ee9351.json')
-        firebase_admin.initialize_app(cred)
-
         db = firestore.client()
 
         doc_ref = db.collection(u'employees').document(u'{}'.format(self.id))
-        d = vars(self)
-        del d['weather_constant']
-        del d['traffic_constant']
-        del d['chat_tone_constant']
-        doc_ref.set(d)
+        doc_ref.set(vars(self))
 
-    def run(self):
+        firebase_admin
+
+    def run_every_15_mins(self):
+        self.run_sensors()
+        self.store_employee_to_firebase()
+
+    def run_every_day(self):
         self.get_daily_stats()
         self.run_sensors()
         self.get_api_stats()
         self.store_employee_to_firebase()
 
+
+cred = credentials.Certificate('ieor185-274323-e16b83ee9351.json')
+firebase_admin.initialize_app(cred)
 
 e = Employee(name="Sudarshan", 
         id=1,
@@ -136,7 +137,57 @@ e = Employee(name="Sudarshan",
         stock_symbol="GOOG"
     )
 
-e.run()
+for i in range(96):
+    e.run_every_15_mins()
+
+    if i % 96 == 0:
+        print(i)
+        e.run_every_day()
+
+# -------------------------
+
+e = Employee(name="Sudarshan's Clone 2", 
+        id=2,
+        age=21, 
+        gender="male", 
+        bodyfat="22", 
+        height="168", 
+        weight="190", 
+        zipcode="94704", 
+        department="Engineering", 
+        team="Infrastructure", 
+        stock_symbol="GOOG"
+    )
+
+for i in range(96 * 2):
+    e.run_every_15_mins()
+
+    if i % 96 == 0:
+        print(i)
+        e.run_every_day()
+
+# -------------------------
+
+e = Employee(name="Sudarshan's Clone 3", 
+        id=3,
+        age=21, 
+        gender="male", 
+        bodyfat="22", 
+        height="168", 
+        weight="190", 
+        zipcode="94704", 
+        department="Engineering", 
+        team="Infrastructure", 
+        stock_symbol="GOOG"
+    )
+
+for i in range(96 * 5):
+    e.run_every_15_mins()
+
+    if i % 96 == 0:
+        print(i)
+        e.run_every_day()
+
 
 
 
