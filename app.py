@@ -148,11 +148,27 @@ def index():
     
     return render_template("index.html", employees=employees, employers=employers)
 
-class F(Form):
-    pass
 
 @app.route(EMPLOYEE_ROUTE + '<id>', methods=['GET', 'POST'])
 def employee(id):
+    class F(Form):
+        pass
+    
+    # Fetch nudges and add to document
+    nudges = []
+    point_count = 0
+    nudges_ref = db.collection(NUDGE_COLLECTION + "-1").stream()
+    for nudge in nudges_ref:
+        nudge_id = nudge.id
+        nudge = nudge.to_dict()
+        nudge["id"] = nudge_id
+        if nudge["responded"] == False: # Only display nudges that the user has not responded to
+            nudges.append(nudge)
+        elif nudge["sent"] == True: # User accepted the nudge
+            point_count += 1
+    for nudge in nudges:
+        setattr(F, nudge["id"], BooleanField(label=nudge["nudge_question"]))
+    
     if request.method == 'POST':
         form = F(request.form)
         for (key, value) in form.data.items():
@@ -175,23 +191,8 @@ def employee(id):
     if doc.exists:
         doc = doc.to_dict()
 
-        # Fetch nudges and add to document
-        nudges = []
-        point_count = 0
-        nudges_ref = db.collection(NUDGE_COLLECTION + "-1").stream()
-        for nudge in nudges_ref:
-            id = nudge.id
-            nudge = nudge.to_dict()
-            nudge["id"] = id
-            if nudge["responded"] == False: # Only display nudges that the user has not responded to
-                nudges.append(nudge)
-            elif nudge["sent"] == True: # User accepted the nudge
-                point_count += 1
         doc["points"] = point_count
         doc["tree_height"] = str(min(500, 150 + point_count * 50)) + "px"
-        
-        for nudge in nudges:
-            setattr(F, nudge["id"], BooleanField(label=nudge["nudge_question"]))
 
         doc["water_percentage"] = round(round(120/600, 2)*100)
         doc["focus_percentage"] = round(round(55/120, 2)*100)
