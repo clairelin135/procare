@@ -13,6 +13,16 @@ import os
 
 # In[2]:
 
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+
+cred = credentials.Certificate('key.json')  
+firebase_admin.initialize_app(cred)
+
+
+# In[3]:
+
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegressionCV
@@ -22,19 +32,20 @@ from sklearn.metrics import accuracy_score
 from sklearn.semi_supervised import LabelPropagation, LabelSpreading
 
 
-# In[3]:
+# In[4]:
 
 def build_predictor_model(X, y):
     logistic_classifier = LogisticRegressionCV()
+    
     logistic_classifier.fit(X, y)
     print("Classifier Accuracy:", logistic_classifier.score(X, y))
     return logistic_classifier 
 
 
-# In[4]:
+# In[5]:
 
 def save_predictor_model(model, name):
-    filename = '{}.sav'.format(name)
+    filename = '/tmp/{}.sav'.format(name)
     pickle.dump(model, open(filename, 'wb'))
     
     bucket_name = "ieor185-274323.appspot.com"
@@ -56,7 +67,7 @@ def save_predictor_model(model, name):
     os.remove(filename)
 
 
-# In[5]:
+# In[6]:
 
 def one_hot_encoding(data, column):
     if column not in data.columns:
@@ -73,9 +84,10 @@ def one_hot_encoding(data, column):
     return data    
 
 
-# In[6]:
+# In[7]:
 
 def sanitize_input_data(df):
+    df = df.reset_index()
     X = df.iloc[:,1:-4]
     Y = df.iloc[:,-4:]
     
@@ -85,16 +97,15 @@ def sanitize_input_data(df):
     X['public_transit_commute'] = X['public_transit_commute'].apply(lambda x: 1 if x.lower() == 'y' else 0)
     X['lunch_cafeteria_or_other'] = X['lunch_cafeteria_or_other'].apply(lambda x: 1 if x.lower() == 'c' else 0)
     X['gender'] = X['gender'].apply(lambda x: 1 if x.lower() == 'male' else 0)
+    
+    X = one_hot_encoding(X.copy(), "location")    
+    X = one_hot_encoding(X.copy(), "season")
 
-    X = one_hot_encoding(X, "location")
-    X = one_hot_encoding(X, "season")
-    
-    
     return X, Y
     
 
 
-# In[7]:
+# In[8]:
 
 def create_models(df):
     X, Y = sanitize_input_data(df)    
@@ -119,31 +130,29 @@ def create_models(df):
     save_predictor_model(depression_model, "allergy")
 
 
-# In[8]:
+# In[9]:
 
-def load_input():
-    bucket_name = "ieor185-274323.appspot.com"
-    blob_name = "health_prediction.csv"
-
-    storage_client = storage.Client.from_service_account_json('key.json')
-    bucket = storage_client.bucket(bucket_name)
-    blob = bucket.blob(blob_name)
-    bytes_data = blob.download_as_string()
+def load_input_firebase():
+    keys_all = ['age', 'gender', 'weight', 'num_task_pending',
+       'average_task_completion_delay', 'avg_sleep', 'calories_eaten',
+       'water_drank', 'lunch_cafeteria_or_other', 'percent_work_done_in_teams',
+       'public_transit_commute', 'entry time', 'exit time', 'hours', 'height',
+       'num_breaks', 'season', 'location', 'has_roommates', 'num_laundry',
+        "sore throat","fever","cough","allergy symptoms"]
     
-    s = str(bytes_data,'utf-8')
-    data = StringIO(s) 
+    db = firestore.client()
     
-    df = pd.read_csv(data)
-    return df
+    docs = db.collection(u'health_prediction').get()
+    rows = []
+    
+    for doc in docs:
+        rows.append(doc.to_dict())
+        
+    return pd.DataFrame(data=rows, columns=keys_all).dropna()
 
 
-# In[10]:
-
-df = load_input()
-create_models(df)
-
-
-# In[ ]:
-
+def main(requests):
+    df = load_input_firebase()
+    create_models(df)
 
 
