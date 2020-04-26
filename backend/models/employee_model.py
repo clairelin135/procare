@@ -206,8 +206,8 @@ for user_id in range(100, 150):
             height=np.random.randint(140,180), 
             weight=np.random.randint(100,200), 
             zipcode=np.random.randint(10000,99999), 
-            department=["Cloud", "Ads", "Search", "Products", "Corporate"][np.random.randint(0,5)], 
-            team=["Engineering", "Marketing", "Operations"][np.random.randint(0, 3)], 
+            department=["engineering", "product-management", "sales"][np.random.randint(0,3)], 
+            team=["Cloud", "Ads", "Search", "Products", "Corporate"][np.random.randint(0, 5)], 
             stock_symbol="GOOG"
         )
 
