@@ -172,39 +172,15 @@ def get_prediction(inp, name):
         
 
 
-# In[23]:
+def main(request):
+    request_json = request.get_json()
+    if request.args and 'message' in request.args:
+        import base64
+        x = request.args.get('message')
+        params = eval(base64.b64decode(x))
+        return get_prediction(params['inp'], params['name'])
 
-inp = {'ID':0, 
-       'age':21, 
-       'gender':"male", 
-       'body_fat_percentage':12, 
-       'height':0, 
-       'weight':0,
-       'num_breaks':5, 
-       'num_task_pending':234, 
-       'average_task_completion_delay':0,
-       'calories_eaten':0, 
-       'morning push percentage':0.2,
-       'afternoon push percentage':0.6, 
-       'evening push percentage':0.2,
-       'git_avg_push_time_difference':10, 
-       'average_chat_tone':'Angry',
-       'ergonomic_risk_rating':5, 
-       'number of times standing':1,
-       'minutes_worked_out':0, 
-       'average_heart_rate':180, 
-       'traffic condition':'Red',
-       'chat-words':"bad", 
-       'location':"77494", 
-       'workplace temperature':"23", 
-       'weather':"rainy",
-       'entry time':3, 
-       'exit time':3, 
-       'stock_ticker':"GOOG", 
-       'stock':-0.01, 
-       'hours':40}
-
-get_prediction(inp, "depression")
+    return f'Error In Parameter'
 
 
 # In[ ]:

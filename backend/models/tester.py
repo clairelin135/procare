@@ -1,28 +1,6 @@
-import numpy as np
-import datetime
-import random
-
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore
-cred = credentials.Certificate('key.json')  
-firebase_admin.initialize_app(cred)
-
 def get_employee_data(user_id, db):
     doc_ref = db.collection(u'employees').document(u'{}'.format(user_id))
     return doc_ref.get().to_dict()
-
-def get_state_prediction_meta(db):
-    doc_ref = db.collection(u'state_prediction').document(u'metadata')
-    return doc_ref.get().to_dict()["row_count"]
-
-def set_new_datastream(db, d, r):
-    doc_ref = db.collection(u'state_prediction').document(u'{}'.format(r))
-    doc_ref.set(d)
-
-def set_new_rowcount(db, r):
-    doc_ref = db.collection(u'state_prediction').document(u'metadata')
-    doc_ref.set({"row_count": r+1})
 
 def get_user_data_for_state_prediction(db, user_id):
     employee_data = get_employee_data(user_id, db)
@@ -61,16 +39,28 @@ def get_user_data_for_state_prediction(db, user_id):
 
     return predictor_data
 
-def run(user_id):
+def get_state_prediction(user_id, state_type):
+    import requests, os, base64
+    import firebase_admin
+    from firebase_admin import credentials
+    from firebase_admin import firestore
+    cred = credentials.Certificate('key.json')  
+    firebase_admin.initialize_app(cred)
     db = firestore.client()
 
-    predictor_data["CARPAL TUNNEL"] = 1 # Call HTTP Endpoint
-    predictor_data["DEPRESSED?"] = 1 # Call HTTP Endpoint
-    predictor_data["LOMBAGO"] = 1 # Call HTTP Endpoint
-    predictor_data["S.A.D.?"] = 1 # Call HTTP Endpoint
-    
-    r = get_state_prediction_meta(db)
-    set_new_datastream(db, predictor_data, r)
-    set_new_rowcount(db, r)
+    inp = get_user_data_for_state_prediction(db, user_id)
 
-run(1)
+    url = "https://us-central1-ieor185-274323.cloudfunctions.net/state_prediction"
+    params = {
+        'inp': inp,
+        'name': state_type
+    }
+
+    import base64
+
+    encoded_dict = str(params).encode('utf-8')
+
+    base64_dict = base64.b64encode(encoded_dict)
+
+    r = requests.get(url, {'message':base64_dict})
+    return eval(r.content)

@@ -135,34 +135,15 @@ def get_prediction(inp, name):
     return str(model.predict_proba(X)[-1][1])
         
 
+def main(request):
+    request_json = request.get_json()
+    if request.args and 'message' in request.args:
+        import base64
+        x = request.args.get('message')
+        params = eval(base64.b64decode(x))
+        return get_prediction(params['inp'], params['name'])
 
-# In[9]:
-
-inp = {
-    'ID':1, 
-    'age':21, 
-    'gender':"male", 
-    'weight':190, 
-    'num_task_pending':0,
-    'average_task_completion_delay':5, 
-    'avg_sleep':8, 
-    'calories_eaten':2000,
-    'water_drank':10, 
-    'lunch_cafeteria_or_other':'c', 
-    'percent_work_done_in_teams':"100%",
-    'public_transit_commute':"y", 
-    'entry time':9, 
-    'exit time':6, 
-    'hours':8, 
-    'height':168,
-    'num_breaks':10, 
-    'season':"spring", 
-    'location':"SF", 
-    'has_roommates':"y", 
-    'num_laundry':"0",
-}
-
-get_prediction(inp, "allergy")
+    return f'Error In Parameter'
 
 
 # In[ ]:
