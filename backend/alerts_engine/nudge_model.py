@@ -60,21 +60,21 @@ class NudgeManager:
         for dept in self.employees.keys():
             for team in self.employees[dept].keys():
 
-                # # State Check
-                # depression_check = any([get_state_prediction(x["id"], "depression") > self.depression_thresh for x in self.employees[dept][team]])
-                # sad_check = any([get_state_prediction(x["id"], "sad") > self.sad_thresh for x in self.employees[dept][team]])
+                # State Check
+                depression_check = any([get_state_prediction(x["id"], "depression") > self.depression_thresh for x in self.employees[dept][team]])
+                sad_check = any([get_state_prediction(x["id"], "sad") > self.sad_thresh for x in self.employees[dept][team]])
 
-                # if depression_check or lombago_check:
-                #     nudges += [NudgePackage(x["id"], now(), "Have you considered some team bonding time?") for x in self.employees[dept][team]]
+                if depression_check or lombago_check:
+                    nudges += [NudgePackage(x["id"], now(), "Have you considered some team bonding time?") for x in self.employees[dept][team]]
 
-                # lombago_check = any([get_state_prediction(x["id"], "lombago") > self.lombago_thresh for x in self.employees[dept][team]])
-                # if lombago_check:
-                #     nudges += [NudgePackage(x["id"], now(), "I think it's time for a team walk! Are you down?") for x in self.employees[dept][team]]
+                lombago_check = any([get_state_prediction(x["id"], "lombago") > self.lombago_thresh for x in self.employees[dept][team]])
+                if lombago_check:
+                    nudges += [NudgePackage(x["id"], now(), "I think it's time for a team walk! Are you down?") for x in self.employees[dept][team]]
 
-                # ct_checks = [get_state_prediction(x["id"], "ct") > self.ct_thresh for x in self.employees[dept][team]]
-                # for check, x in zip(ct_checks, self.employees[dept][team]):
-                #     if check:
-                #         nudges += [NudgePackage(x["id"], now(), "Hey! I think you should take a break! Considered grabbing a quick bite?")]
+                ct_checks = [get_state_prediction(x["id"], "ct") > self.ct_thresh for x in self.employees[dept][team]]
+                for check, x in zip(ct_checks, self.employees[dept][team]):
+                    if check:
+                        nudges += [NudgePackage(x["id"], now(), "Hey! I think you should take a break! Considered grabbing a quick bite?")]
 
 
                 # Health Check
@@ -95,16 +95,16 @@ class NudgeManager:
         for nudge in nudges:
             nudge.send()
         
-# def delete_collection(coll_ref, batch_size):
-#     db = firestore.client()
-#     coll_ref = db.collection(u'{}'.format(coll_ref))
-#     docs = coll_ref.get()
+def delete_collection(coll_ref, batch_size):
+    db = firestore.client()
+    coll_ref = db.collection(u'{}'.format(coll_ref))
+    docs = coll_ref.get()
 
-#     for doc in docs:
-#         print(u'Deleting doc {} => {}'.format(doc.id, doc.to_dict()))
-#         doc.reference.delete()
+    for doc in docs:
+        print(u'Deleting doc {} => {}'.format(doc.id, doc.to_dict()))
+        doc.reference.delete()
 
-# for i in range(101, 150):
-#     delete_collection("nudges-{}".format(i), 50)
+for i in range(101, 150):
+    delete_collection("nudges-{}".format(i), 50)
 
 NudgeManager().run()
