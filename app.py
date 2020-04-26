@@ -22,12 +22,6 @@ import requests
 #     "measurementId": "G-1SCRZGN73Q"
 # }
 
-# firebase = pyrebase.initialize_app(config)
-# db  = firebase.database()
-# db.child("names").push({
-#     "name": "Elden"
-# })
-
 # Initialize Flask App
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
@@ -43,86 +37,7 @@ EMPLOYEE_COLLECTION = "employees"
 NUDGE_COLLECTION = "nudges"
 
 EMPLOYER_ROUTE = "/employer/"
-EMPLOYEE_ROUTE = "/employee/"
-
-# given collection, and document, adds an name/age entry into db
-@app.route('/add', methods=['POST'])
-def create_employee():
-    try:
-        body = request.json
-        id = body['id']
-        collection = body['collection']
-        document = body['document']
-        name = body["name"]
-        age = body["age"]
-
-        doc_ref = db.collection(collection).document(document+str(id))
-        doc_ref.set({
-            "name": name,
-            "age": age
-        })
-        return jsonify({"success": True}), 200
-    except Exception as e:
-        return f"An Error Occured: {e}"
-
-# returns the requested
-# json req keys: id, collection, document, field
-@app.route('/list', methods=['GET'])
-def read_employee_info():
-    try:
-        body = request.json
-        id = body['id']
-        collection = body['collection']
-        document = body['document']
-        doc_ref = db.collection(collection).document(document+str(id))
-        doc = doc_ref.get()
-
-        if doc.exists:
-            doc = doc.to_dict()
-            return jsonify({
-                'name': doc['name'],
-                'age': doc['age']
-            })
-    except Exception as e:
-        return f"An Error Occured: {e}"
-
-# updates an employee field
-# json req requires: id, collection, document, field, update
-@app.route('/update', methods=['POST', 'PUT'])
-def update():
-    """
-        update() : Update document in Firestore collection with request body
-        Ensure you pass a custom ID as part of json body in post request
-        e.g. json={'id': '1', 'title': 'Write a blog post today'}
-    """
-    try:
-        body = request.json
-        id = body['id']
-        collection = body['collection']
-        document = body['document']
-        doc_ref = db.collection(collection).document(document+str(id))
-        doc_ref.update({body['field']: body['update']})
-        return jsonify({"success": True}), 200
-    except Exception as e:
-        return f"An Error Occured: {e}"
-
-# delete an employee
-# json requires: id
-@app.route('/delete', methods=['GET'])
-def delete_employee():
-    """
-        delete() : Delete a document from Firestore collection
-    """
-    try:
-        # Check for ID in URL query
-        body = request.json
-        id = body['id']
-        doc_ref = db.collection('employees').document('employee'+str(id))
-        doc_ref.delete()
-
-        return jsonify({"success": True}), 200
-    except Exception as e:
-        return f"An Error Occured: {e}"
+EMPLOYEE_ROUTE = "/employee/"      
 
 @app.route('/')
 def index():
@@ -220,24 +135,55 @@ def employee(id):
     else:
         return f"User does not exist"
 
-@app.route(EMPLOYER_ROUTE + '<id>')
-def employer():
-    # collection = "employers"
-    # document = "2020-04-16"
-    #
-    # doc_ref = db.collection(collection).document(document)
-    # doc = doc_ref.get()
-    #
-    # dunno what the real data will actually
-    doc = {'emotion-percentage': '65%',
-            'product-percentage':'75%',
-            'nutrition-percentage': '85%',
+db_m = {'1': 'engineering', '2': 'product-management', '3': 'sales'}
+human_m = {'1': 'Engineering', '2': 'Product', '3': 'Sales'}
+@app.route(EMPLOYER_ROUTE + '<id>', methods=['GET', 'POST'])
+def employer(id):
+    document = db_m[id]
+    
+    emo_p = get_weekly_average(document, "emotional_level")
+    pro_p = get_weekly_average(document, "productivity")
+    phy_p = get_weekly_average(document, "physical_wellness")
+    admin_name = get_admin_name(db_m[id])
+    print(emo_p)
+    print(pro_p)
+    print(phy_p)
+
+    
+    doc = {'emotion-percentage': str(emo_p)+'%',
+            'product-percentage': str(pro_p)+'%',
+            'physical-percentage': str(phy_p)+'%',
             'attendance': 300,
             'late': 10,
-            'absent': 5}
+            'absent': 5,
+            'admin-name': admin_name,
+            'dep-name': human_m[id]
+        }
 
     return render_template("employer.html", data=doc)
 
+# document: [product-management, engineering, sales]
+# stat: [emotional_level, productivity, physical_wellness]
+def get_weekly_average(department, stat):
+    total = 0
+    day = 21
+    for _ in range(7):
+        date = "2020-04-" + str(day)
+        doc_stream = db.collection(EMPLOYER_COLLECTION).document(date).collection(department).stream()
+        for doc in doc_stream:
+            json_doc = doc.to_dict()
+            p = json_doc[stat]
+            total += p
+            break
+        day -= 1
+    return round((total / 7)  * 100)
+
+def get_admin_name(department):
+    doc_ref = db.collection(EMPLOYER_COLLECTION).document('admin_info')
+    doc = doc_ref.get().to_dict()
+    return doc[department]
+        
+    
 @app.route("/predict", methods=['GET'])
 def predict():
     body = request.json
@@ -277,11 +223,11 @@ def predict():
         'hours':40
     }
 
-    if doc.exists or True:
-        # employee_m = doc.to_dict()
-        url = "https://us-central1-ieor185-274323.cloudfunctions.net/predictor2"
+    if doc.exists:
+        employee_m = doc.to_dict()
+        url = "https://us-central1-ieor185-274323.cloudfunctions.net/state_prediction?message=eydpbnAnOiB7J0lEJzogMCwgJ2FnZSc6IDIxLCAnZ2VuZGVyJzogJ21hbGUnLCAnYm9keV9mYXRfcGVyY2VudGFnZSc6IDEyLCAnaGVpZ2h0JzogMCwgJ3dlaWdodCc6IDAsICdudW1fYnJlYWtzJzogNSwgJ251bV90YXNrX3BlbmRpbmcnOiAyMzQsICdhdmVyYWdlX3Rhc2tfY29tcGxldGlvbl9kZWxheSc6IDAsICdjYWxvcmllc19lYXRlbic6IDAsICdtb3JuaW5nIHB1c2ggcGVyY2VudGFnZSc6IDAuMiwgJ2FmdGVybm9vbiBwdXNoIHBlcmNlbnRhZ2UnOiAwLjYsICdldmVuaW5nIHB1c2ggcGVyY2VudGFnZSc6IDAuMiwgJ2dpdF9hdmdfcHVzaF90aW1lX2RpZmZlcmVuY2UnOiAxMCwgJ2F2ZXJhZ2VfY2hhdF90b25lJzogJ0FuZ3J5JywgJ2VyZ29ub21pY19yaXNrX3JhdGluZyc6IDUsICdudW1iZXIgb2YgdGltZXMgc3RhbmRpbmcnOiAxLCAnbWludXRlc193b3JrZWRfb3V0JzogMCwgJ2F2ZXJhZ2VfaGVhcnRfcmF0ZSc6IDE4MCwgJ3RyYWZmaWMgY29uZGl0aW9uJzogJ1JlZCcsICdjaGF0LXdvcmRzJzogJ2JhZCcsICdsb2NhdGlvbic6ICc3NzQ5NCcsICd3b3JrcGxhY2UgdGVtcGVyYXR1cmUnOiAnMjMnLCAnd2VhdGhlcic6ICdyYWlueScsICdlbnRyeSB0aW1lJzogMywgJ2V4aXQgdGltZSc6IDMsICdzdG9ja190aWNrZXInOiAnR09PRycsICdzdG9jayc6IC0wLjAxLCAnaG91cnMnOiA0MH0sICduYW1lJzogJ2RlcHJlc3Npb24nfQ=="
         params = {
-            'inp': inp,
+            'inp': employee_m,
             'name': 'depression'
         }
         r = requests.get(url, params)
