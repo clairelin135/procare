@@ -20,14 +20,14 @@ class Employee:
         self.department = department
         self.team = team
         self.stock_symbol = stock_symbol
-
+        
         # User Input
         self.calories_eaten = []
         self.water_consumed = []
         self.mins_workedout = []
-
-        # Chat
-        self.nudge_responses = []
+        self.sleep = []
+        self.public_transit_commute = []
+        self.num_laundry = []
 
         # Sensor - API
         self.num_task_pendings = []
@@ -38,7 +38,11 @@ class Employee:
         self.temperature = []
         self.stock_ytd = []
         self.chat_tone = []
-
+        
+        self.lunch_cafeteria_or_other = []
+        self.percent_work_done_in_teams = []
+        self.season = []
+        
         # Sensor - Hardware
         self.break_durations = []
         self.focustimes = []
@@ -59,6 +63,11 @@ class Employee:
         self.weather_constant = ["rainy", "overcast", "snowing", "sunny"]
         self.traffic_constant = ["red", "yellow", "green"]
         self.chat_tone_constant = ["Angry", "Happy"]
+        self.public_transit_constant = ["y", "n"]
+        self.lunch_cafeteria_constant = ["c", "o"]
+        self.roommates = ["y", "n"][np.random.randint(0, 2)]
+        self.season_constant = ["fall","spring","summer", "winter"]
+        
         
         
 
@@ -67,7 +76,10 @@ class Employee:
         self.entrance_time.append({"time":now, "data":np.random.randint(3,11)})
         self.exit_time.append({"time":now, "data":np.random.randint(15,23)})
         self.traffic.append({"time":now, "data":self.traffic_constant[np.random.randint(0, len(self.traffic_constant))]})
-
+        self.public_transit_commute.append({"time":now, "data":self.public_transit_constant[np.random.randint(0, len(self.public_transit_constant))]})
+        self.lunch_cafeteria_or_other.append({"time":now, "data":self.lunch_cafeteria_constant[np.random.randint(0, len(self.public_transit_constant))]})
+        self.season.append({"time":now, "data":self.season_constant[np.random.randint(0, len(self.season_constant))]})
+        
         x = np.random.random()
         y = (1-x) * np.random.random()
         z = 1 - x - y
@@ -75,8 +87,16 @@ class Employee:
         self.git_push_dist_morning.append({"time":now, "data":x})
         self.git_push_dist_afternoon.append({"time":now, "data":y})
         self.git_push_dist_evening.append({"time":now, "data":z})
-        self.avg_task_delay.append({"time":now, "data":np.random.randint(0, 24*60*7)})
+        self.avg_task_delay.append({"time":now, "data":np.random.randint(0, 50)})
         self.num_task_pendings.append({"time":now, "data":np.random.randint(0,100)})
+        self.percent_work_done_in_teams.append({"time":now, "data":str(np.random.randint(0,100))+"%"})
+        
+        self.sleep.append({"time":now, "data":np.random.randint(0, 10)})
+        self.calories_eaten.append({"time":now, "data":np.random.randint(0, 2500)})
+        self.mins_workedout.append({"time":now, "data":np.random.randint(0, 120)})
+        self.water_consumed.append({"time":now, "data":np.random.randint(0, 8)})
+        self.num_laundry.append({"time":now, "data":np.random.randint(0, 10)})
+        
 
 
     
@@ -88,7 +108,7 @@ class Employee:
         self.stock_ytd.append({"time":now, "data":np.random.random() * (-1 * np.random.randint(0,2))})  # Replace this with Yahoo Finance API
         self.chat_tone.append({"time":now, "data":self.chat_tone_constant[np.random.randint(0, len(self.chat_tone_constant))]})
         self.weather.append({"time":now, "data":self.weather_constant[np.random.randint(0, len(self.weather_constant))]})
-
+        
 
     # This is simulated to run every 15 minutes
     def run_sensors(self):
@@ -125,18 +145,69 @@ class Employee:
 cred = credentials.Certificate('key.json')
 firebase_admin.initialize_app(cred)
 
-for user_id in range(100, 125):
+names = ["Selina Key",
+"Jordon Clayton",
+"Israel Christensen",
+"Bradyn Wang",
+"Jewel Gaines",
+"Bryan Crane",
+"Derrick Juarez",
+"Zain Carter",
+"Angelique Hernandez",
+"America Bernard",
+"Abbie Shaw",
+"Jamya Stark",
+"Violet Mullins",
+"Lucas Marquez",
+"Casey Le",
+"Arjun Patel",
+"Kate Stevenson",
+"Lamar Luna",
+"Krista Perry",
+"Mya Perry",
+"Ryan Chang",
+"Aracely Stevenson",
+"Billy Barry",
+"Madelyn Flores",
+"Holden Oconnell",
+"Leland Davidson",
+"Samuel Fitzpatrick",
+"Emanuel Valenzuela",
+"Janiah Melton",
+"Juliana Mcneil",
+"Cassie Zimmerman",
+"Kolby Barr",
+"Abbigail Lloyd",
+"Alan Mcguire",
+"Santino Mendoza",
+"Hazel Dennis",
+"Sienna Andrews",
+"Derrick Bowen",
+"Parker Clayton",
+"Kobe Huffman",
+"Emma Boyer",
+"Ellen Raymond",
+"Yasmin Summers",
+"Nadia Shepherd",
+"Maggie Mitchell",
+"Ruben Crane",
+"Aileen Monroe",
+"Tommy Gibbs",
+"Araceli Nelson",
+"Lola Meyer"]
+
+for user_id in range(100, 150):
     print("user id:", user_id)
-    e = Employee(name="Sudarshan", 
+    e = Employee(name=names[user_id%len(names)], 
             id=user_id,
-            age=21, 
+            age=np.random.randint(18, 65), 
             gender="male", 
-            bodyfat="22", 
-            height="168", 
-            weight="190", 
-            zipcode="94704", 
-            department="Engineering", 
-            team="Infrastructure", 
+            bodyfat=np.random.randint(5,25), 
+            height=np.random.randint(140,180), 
+            weight=np.random.randint(100,200), 
+            zipcode=np.random.randint(10000,99999), 
+            department=["Cloud", "Ads", "Search", "Products", "Corporate"][np.random.randint(0,5)], 
+            team=["Engineering", "Marketing", "Operations"][np.random.randint(0, 3)], 
             stock_symbol="GOOG"
         )
 
@@ -204,4 +275,3 @@ for user_id in range(100, 125):
         
         
         
-
