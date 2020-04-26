@@ -10,6 +10,7 @@ from bokeh.models import DatetimeTickFormatter
 from bokeh.embed import components
 from wtforms import Form, BooleanField
 import requests
+import datetime
 from backend.models.prediction_retriever import get_state_prediction, get_health_prediction
 
 # config = {
@@ -36,9 +37,10 @@ db = firestore.client()
 EMPLOYER_COLLECTION = "employers"
 EMPLOYEE_COLLECTION = "employees"
 NUDGE_COLLECTION = "nudges"
+ACTIONS_COLLECTION = "actions"
 
 EMPLOYER_ROUTE = "/employer/"
-EMPLOYEE_ROUTE = "/employee/"      
+EMPLOYEE_ROUTE = "/employee/"
 
 @app.route('/')
 def index():
@@ -62,7 +64,7 @@ def index():
     #         "id": doc.id
     #     }
     #     employers.append(employer)
-    
+
     return render_template("index.html", employees=employees, employers=employers)
 
 
@@ -70,7 +72,7 @@ def index():
 def employee(id):
     class F(Form):
         pass
-    
+
     # Fetch nudges and add to document
     nudges = []
     point_count = 0
@@ -85,7 +87,7 @@ def employee(id):
             point_count += 1
     for nudge in nudges:
         setattr(F, nudge["id"], BooleanField(label=nudge["nudge_question"]))
-    
+
     if request.method == 'POST':
         form = F(request.form)
         for (key, value) in form.data.items():
@@ -141,8 +143,7 @@ human_m = {'1': 'Engineering', '2': 'Product', '3': 'Sales'}
 @app.route(EMPLOYER_ROUTE + '<id>', methods=['GET', 'POST'])
 def employer(id):
     department = db_m[id]
-    print(department)
-    
+
     emo_p = get_weekly_average(department, "emotional_level")
     pro_p = get_weekly_average(department, "productivity")
     phy_p = get_weekly_average(department, "physical_wellness")
@@ -150,7 +151,7 @@ def employer(id):
     attendance = get_attr(department, 'attendance')
     late = get_attr(department, 'late')
     absent = get_attr(department, 'absent')
-    
+
     doc = {'emotion-percentage': str(emo_p)+'%',
             'product-percentage': str(pro_p)+'%',
             'physical-percentage': str(phy_p)+'%',
@@ -159,11 +160,84 @@ def employer(id):
             'absent': absent,
             'admin-name': admin_name,
             'dep-name': human_m[id],
+            'top-illness': 'depression'
         }
+    depression_actions = {
+        'action1-name': 'Send Nudges',
+        'action1-description': 'ye',
+        'action1-action': 'uhh onclick actions?',
+        'action2-name': 'Meditation',
+        'action2-description': 'sign up for meditating',
+        'action2-action': 'uhh onclick actions?',
+        'action3-name': 'Gym',
+        'action3-description': 'yall fat',
+        'action3-action': 'uhh onclick actions?'
+    }
 
-    return render_template("employer.html", data=doc)
+    actions_doc = db.collection(ACTIONS_COLLECTION).document(doc['top-illness']).get()
+    if actions_doc.exists:
+        actions = actions_doc.to_dict()
+    else:
+        actions = depression_actions
 
-# document: [product-management, engineering, sales]
+    x = get_x_axis()
+    script_prod, div_prod = create_plot(x, 'productivity')
+    script_em, div_em = create_plot(x, 'emotional_level')
+    script_ph, div_ph = create_plot(x, 'physical_wellness')
+
+    return render_template("employer.html", data=doc, actions=actions, script_prod=script_prod, div_prod=div_prod,
+    script_em=script_em, div_em=div_em, script_ph=script_ph, div_ph=div_ph)
+
+#stat: emotional_level, physical_wellness, productivity
+# creates plot for all departments for one stat type
+def create_plot(x, stat):
+    y_axis_label = ""
+    if stat == "productivity":
+        y_axis_label = "Productivity"
+    elif stat == "emotional_level":
+        y_axis_label = "Emotional Wellness"
+    elif stat == "physical_wellness":
+        y_axis_label = "Physical Wellness"
+
+    eng = []
+    pm = []
+    sal = []
+    for date in x:
+        for dept in ['engineering', 'product-management', 'sales']:
+            doc_stream = db.collection(EMPLOYER_COLLECTION).document(date.strftime("%Y-%m-%d")).collection(dept).stream()
+            for doc in doc_stream:
+                json_doc = doc.to_dict()
+                if dept == 'engineering':
+                    eng.append(json_doc[stat])
+                elif dept == 'product-management':
+                    pm.append(json_doc[stat])
+                elif dept == 'sales':
+                    sal.append(json_doc[stat])
+
+    p = figure(x_axis_type="datetime", y_range=(0, 1), plot_width=550, plot_height=300)
+    p.line(x, eng, line_width=2, line_color="#8CCFBB") #eng is green
+    p.line(x, pm, line_width=2, line_color="#eaadbd") #pm is pink
+    p.line(x, sal, line_width=2, line_color="#ffa751") #sales is orange
+    p.toolbar_location = None
+    p.xaxis.axis_label = "Day"
+    p.yaxis.axis_label = y_axis_label
+
+    script, div = components(p)
+
+    return script, div
+
+
+
+def get_x_axis():
+    day = 21
+    x = []
+    for _ in range(7):
+        #date = "2020-04-" + str(day)
+        x.insert(0, datetime.datetime(2020, 4, day))
+        day -= 1
+    return x
+
+# deparatment: [product-management, engineering, sales]
 # stat: [emotional_level, productivity, physical_wellness]
 def get_weekly_average(department, stat):
     total = 0
@@ -183,7 +257,7 @@ def get_attr(department, attr):
     doc_ref = db.collection(EMPLOYER_COLLECTION).document(attr)
     doc = doc_ref.get().to_dict()
     return doc[department]
-    
+
 @app.route("/predict", methods=['GET'])
 def predict():
     body = request.json

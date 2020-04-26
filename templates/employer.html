@@ -19,47 +19,69 @@
         <div class="tile bg-blue mr1 pa4 flex flex-column items-center">
           <div class="mb4">
             <h2 class="white">Productivity</h2>
-            <h3 class="white mt2">Across Customer Success, Engineering, Product
-            Management, and Sales departments</h3>
+            <h3 class="white mt2">Across department</h3>
           </div>
             <h1 class="white mt2">{{data["product-percentage"]}}</h1>
         </div>
         <div class="tile bg-gold ml1 mr1 pa4 flex flex-column items-center">
           <div class="mb4">
             <h2 class="white">Emotional Level</h2>
-            <h3 class="white mt2">Across Customer Success, Engineering, Product
-            Management, and Sales departments</h3>
+            <h3 class="white mt2">Across department</h3>
           </div>
           <h1 class="white mt2">{{data["emotion-percentage"]}}</h1>
         </div>
         <div class="tile bg-light-green ml1 pa4 flex flex-column items-center">
           <div class="mb4">
             <h2 class="white">Physical Wellness</h2>
-            <h3 class="white mt2">Across Customer Success, Engineering, Product
-            Management, and Sales departments</h3>
+            <h3 class="white mt2">Across department</h3>
           </div>
           <h1 class="white mt2">{{data["physical-percentage"]}}</h1>
         </div>
       </div>
+
+      <div class="flex mt1 bg-white pa4 flex-column items-center">
+        <h2 class="mb3">Productivity Over the Week</h2>
+        {{ div_prod |safe }}
+        <script src="https://cdn.pydata.org/bokeh/release/bokeh-2.0.2.min.js"></script>
+        <script src="https://cdn.pydata.org/bokeh/release/bokeh-widgets-2.0.2.min.js"></script>
+        {{ script_prod |safe }}
+      </div>
+      <div class="flex mt1 bg-white pa4 flex-column items-center">
+        <h2 class="mb3">Emotional Wellness Over the Week</h2>
+        {{ div_em |safe }}
+        <script src="https://cdn.pydata.org/bokeh/release/bokeh-2.0.2.min.js"></script>
+        <script src="https://cdn.pydata.org/bokeh/release/bokeh-widgets-2.0.2.min.js"></script>
+        {{ script_em |safe }}
+      </div>
+      <div class="flex mt1 bg-white pa4 flex-column items-center">
+        <h2 class="mb3">Physical Wellness Over the Week</h2>
+        {{ div_ph |safe }}
+        <script src="https://cdn.pydata.org/bokeh/release/bokeh-2.0.2.min.js"></script>
+        <script src="https://cdn.pydata.org/bokeh/release/bokeh-widgets-2.0.2.min.js"></script>
+        {{ script_ph |safe }}
+      </div>
+
+
+
       <div class="flex mt3 bg-white pa4 flex-column items-center">
-        <h2 class="mb4">Recommended Action Plan</h2>
+        <h2 class="mb4">Recommended Action Plans</h2>
         <div class="flex flex-row mb1">
           <div class="tile bg-gray mr1 pa4 flex flex-column items-center">
             <div class="mb4">
-              <h2 class="white">Party Friday!</h2>
-              <h3 class="white mt2">Have a social hour this Friday</h3>
+              <h2 class="white">{{actions["action1-name"]}}</h2>
+              <h3 class="white mt2">{{actions["action1-description"]}}</h3>
             </div>
           </div>
           <div class="tile bg-gray ml1 mr1 pa4 flex flex-column items-center">
             <div class="mb4">
-              <h2 class="white">Group Yoga Classes</h2>
-              <h3 class="white mt2">Sign up for corporate wide yoga classes</h3>
+              <h2 class="white">{{actions["action2-name"]}}</h2>
+              <h3 class="white mt2">{{actions["action2-description"]}}</h3>
             </div>
           </div>
           <div class="tile bg-gray ml1 pa4 flex flex-column items-center">
             <div class="mb4">
-              <h2 class="white">Expert Visit</h2>
-              <h3 class="white mt2">Find local health experts in your area</h3>
+              <h2 class="white">{{actions["action3-name"]}}</h2>
+              <h3 class="white mt2">{{actions["action3-description"]}}</h3>
             </div>
           </div>
         </div>
