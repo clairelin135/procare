@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[70]:
+# In[15]:
 
 import pandas as pd
 import numpy as np
@@ -12,7 +12,17 @@ from io import BytesIO
 import ast
 
 
-# In[71]:
+# In[16]:
+
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+
+cred = credentials.Certificate('key.json')  
+firebase_admin.initialize_app(cred)
+
+
+# In[17]:
 
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.ensemble import RandomForestClassifier
@@ -22,7 +32,7 @@ from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.metrics import accuracy_score
 
 
-# In[72]:
+# In[18]:
 
 def one_hot_encoding(data, column):
     if column not in data.columns:
@@ -68,7 +78,7 @@ def traffic_condition_processing(tc):
     
 
 
-# In[73]:
+# In[19]:
 
 def load_predictor_model(name):
     bucket_name = "ieor185-274323.appspot.com"
@@ -86,13 +96,11 @@ def load_predictor_model(name):
     return loaded_model
 
 
-# In[74]:
+# In[20]:
 
 def sanitize_input_data(df):
     X = df.iloc[:,1:-4]
-    
-    # Data Sanitization
-    X['stock'] = X['stock'].apply(lambda x: float(str(x)[:-1])/100)  
+     
     X['weather'] = X['weather'].apply(lambda x: x.lower())
     X = one_hot_encoding(X, 'gender')
     X = one_hot_encoding(X, 'weather')
@@ -105,25 +113,32 @@ def sanitize_input_data(df):
     
 
 
-# In[75]:
+# In[21]:
 
-def load_csv_input():
-    bucket_name = "ieor185-274323.appspot.com"
-    blob_name = "state_prediction.csv"
-
-    storage_client = storage.Client.from_service_account_json('key.json')
-    bucket = storage_client.bucket(bucket_name)
-    blob = bucket.blob(blob_name)
-    bytes_data = blob.download_as_string()
+def load_input_firebase():
+    keys_all = ['ID', 'age', 'gender', 'body_fat_percentage', 'height', 'weight',
+       'num_breaks', 'num_task_pending', 'average_task_completion_delay',
+       'calories_eaten', 'morning push percentage',
+       'afternoon push percentage', 'evening push percentage',
+       'git_avg_push_time_difference', 'average_chat_tone',
+       'ergonomic_risk_rating', 'number of times standing',
+       'minutes_worked_out', 'average_heart_rate', 'traffic condition',
+       'chat-words', 'location', 'workplace temperature', 'weather',
+       'entry time', 'exit time', 'stock_ticker', 'stock', 'hours',
+        'DEPRESSED?', 'S.A.D.?', 'LOMBAGO', 'CARPAL TUNNEL']
     
-    s = str(bytes_data,'utf-8')
-    data = StringIO(s) 
+    db = firestore.client()
     
-    df = pd.read_csv(data)
-    return df
+    docs = db.collection(u'state_prediction').get()
+    rows = []
+    
+    for doc in docs:
+        rows.append(doc.to_dict())
+        
+    return pd.DataFrame(data=rows, columns=keys_all).dropna()
 
 
-# In[76]:
+# In[22]:
 
 def get_prediction(inp, name):
     keys = ['ID', 'age', 'gender', 'body_fat_percentage', 'height', 'weight',
@@ -145,7 +160,7 @@ def get_prediction(inp, name):
         else:
             return -1
     
-    df = load_csv_input()
+    df = load_input_firebase()
     df = df.append(final, ignore_index=True)
     X = sanitize_input_data(df)
     
@@ -153,41 +168,27 @@ def get_prediction(inp, name):
     model = load_predictor_model(name)
     
     
-    return model.predict_proba(X)[-1][1]
+    return str(model.predict_proba(X)[-1][1])
         
 
 
-# In[77]:
+def main(request):
+    request_json = request.get_json()
+    if request.args and 'message' in request.args:
+        import base64
+        x = request.args.get('message')
+        params = eval(base64.b64decode(x))
+        return get_prediction(params['inp'], params['name'])
 
-inp = {'ID':0, 
-       'age':21, 
-       'gender':"male", 
-       'body_fat_percentage':12, 
-       'height':169, 
-       'weight':200,
-       'num_breaks':5, 
-       'num_task_pending':234, 
-       'average_task_completion_delay':1000,
-       'calories_eaten':500, 
-       'morning push percentage':0.2,
-       'afternoon push percentage':0.6, 
-       'evening push percentage':0.2,
-       'git_avg_push_time_difference':10, 
-       'average_chat_tone':'Angry',
-       'ergonomic_risk_rating':5, 
-       'number of times standing':1,
-       'minutes_worked_out':0, 
-       'average_heart_rate':180, 
-       'traffic condition':'Red',
-       'chat-words':"bad", 
-       'location':"77494", 
-       'workplace temperature':"23", 
-       'weather':"rainy",
-       'entry time':3, 
-       'exit time':23, 
-       'stock_ticker':"GOOG", 
-       'stock':"-35%", 
-       'hours':40}
+    return f'Error In Parameter'
 
-get_prediction(inp, "depression")
+
+# In[ ]:
+
+
+
+
+# In[ ]:
+
+
 

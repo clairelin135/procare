@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[30]:
+# In[1]:
 
 import pandas as pd
 import numpy as np
@@ -11,7 +11,17 @@ from io import StringIO
 import os
 
 
-# In[31]:
+# In[2]:
+
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+
+cred = credentials.Certificate('key.json')  
+firebase_admin.initialize_app(cred)
+
+
+# In[3]:
 
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.ensemble import RandomForestClassifier
@@ -22,7 +32,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.semi_supervised import LabelPropagation, LabelSpreading
 
 
-# In[32]:
+# In[4]:
 
 def one_hot_encoding(data, column):
     if column not in data.columns:
@@ -68,7 +78,7 @@ def traffic_condition_processing(tc):
     
 
 
-# In[33]:
+# In[5]:
 
 def build_predictor_model(X, y):
     logistic_classifier = LogisticRegressionCV()
@@ -77,10 +87,10 @@ def build_predictor_model(X, y):
     return logistic_classifier 
 
 
-# In[34]:
+# In[6]:
 
 def save_predictor_model(model, name):
-    filename = '{}.sav'.format(name)
+    filename = '/tmp/{}.sav'.format(name)
     pickle.dump(model, open(filename, 'wb'))
     
     bucket_name = "ieor185-274323.appspot.com"
@@ -102,14 +112,12 @@ def save_predictor_model(model, name):
     os.remove(filename)
 
 
-# In[35]:
+# In[7]:
 
 def sanitize_input_data(df):
     X = df.iloc[:,1:-4]
     Y = df.iloc[:,-4:]
-    
-    # Data Sanitization
-    X['stock'] = X['stock'].apply(lambda x: float(str(x)[:-1])/100)  
+     
     X['weather'] = X['weather'].apply(lambda x: x.lower())
     X = one_hot_encoding(X, 'gender')
     X = one_hot_encoding(X, 'weather')
@@ -122,7 +130,7 @@ def sanitize_input_data(df):
     
 
 
-# In[36]:
+# In[8]:
 
 def create_models(df):
     X, Y = sanitize_input_data(df)
@@ -148,36 +156,34 @@ def create_models(df):
     save_predictor_model(depression_model, "ct")
 
 
-# In[37]:
+# In[9]:
 
-def load_input():
-    bucket_name = "ieor185-274323.appspot.com"
-    blob_name = "state_prediction.csv"
-
-    storage_client = storage.Client.from_service_account_json('key.json')
-    bucket = storage_client.bucket(bucket_name)
-    blob = bucket.blob(blob_name)
-    bytes_data = blob.download_as_string()
+def load_input_firebase():
+    keys_all = ['ID', 'age', 'gender', 'body_fat_percentage', 'height', 'weight',
+       'num_breaks', 'num_task_pending', 'average_task_completion_delay',
+       'calories_eaten', 'morning push percentage',
+       'afternoon push percentage', 'evening push percentage',
+       'git_avg_push_time_difference', 'average_chat_tone',
+       'ergonomic_risk_rating', 'number of times standing',
+       'minutes_worked_out', 'average_heart_rate', 'traffic condition',
+       'chat-words', 'location', 'workplace temperature', 'weather',
+       'entry time', 'exit time', 'stock_ticker', 'stock', 'hours',
+        'DEPRESSED?', 'S.A.D.?', 'LOMBAGO', 'CARPAL TUNNEL']
     
-    s = str(bytes_data,'utf-8')
-    data = StringIO(s) 
+    db = firestore.client()
     
-    df = pd.read_csv(data)
-    return df
+    docs = db.collection(u'state_prediction').get()
+    rows = []
+    
+    for doc in docs:
+        rows.append(doc.to_dict())
+        
+    return pd.DataFrame(data=rows, columns=keys_all).dropna()
 
 
-# In[38]:
-
-df = load_input()
-create_models(df)
-
-
-# In[ ]:
-
-
-
-
-# In[ ]:
-
+# In[10]:
+def main(request):
+    df = load_input_firebase()
+    create_models(df)
 
 

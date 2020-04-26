@@ -14,6 +14,16 @@ import ast
 
 # In[2]:
 
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+
+cred = credentials.Certificate('key.json')  
+firebase_admin.initialize_app(cred)
+
+
+# In[3]:
+
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegressionCV
@@ -22,7 +32,7 @@ from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.metrics import accuracy_score
 
 
-# In[3]:
+# In[4]:
 
 def one_hot_encoding(data, column):
     if column not in data.columns:
@@ -39,7 +49,7 @@ def one_hot_encoding(data, column):
     return data    
 
 
-# In[4]:
+# In[5]:
 
 def load_predictor_model(name):
     bucket_name = "ieor185-274323.appspot.com"
@@ -57,7 +67,7 @@ def load_predictor_model(name):
     return loaded_model
 
 
-# In[5]:
+# In[6]:
 
 def sanitize_input_data(df):
     X = df.iloc[:,1:-4]
@@ -77,25 +87,28 @@ def sanitize_input_data(df):
     return X, Y
 
 
-# In[6]:
+# In[7]:
 
-def load_csv_input():
-    bucket_name = "ieor185-274323.appspot.com"
-    blob_name = "health_prediction.csv"
-
-    storage_client = storage.Client.from_service_account_json('key.json')
-    bucket = storage_client.bucket(bucket_name)
-    blob = bucket.blob(blob_name)
-    bytes_data = blob.download_as_string()
+def load_input_firebase():
+    keys_all = ['ID', 'age', 'gender', 'weight', 'num_task_pending',
+       'average_task_completion_delay', 'avg_sleep', 'calories_eaten',
+       'water_drank', 'lunch_cafeteria_or_other', 'percent_work_done_in_teams',
+       'public_transit_commute', 'entry time', 'exit time', 'hours', 'height',
+       'num_breaks', 'season', 'location', 'has_roommates', 'num_laundry',
+        "sore throat","fever","cough","allergy symptoms"]
     
-    s = str(bytes_data,'utf-8')
-    data = StringIO(s) 
+    db = firestore.client()
     
-    df = pd.read_csv(data)
-    return df
+    docs = db.collection(u'health_prediction').get()
+    rows = []
+    
+    for doc in docs:
+        rows.append(doc.to_dict())
+        
+    return pd.DataFrame(data=rows, columns=keys_all).dropna()
 
 
-# In[12]:
+# In[8]:
 
 def get_prediction(inp, name):
     keys = ['ID', 'age', 'gender', 'weight', 'num_task_pending',
@@ -113,44 +126,24 @@ def get_prediction(inp, name):
         else:
             return -1
     
-    df = load_csv_input()
+    df = load_input_firebase()
     df = df.append(final, ignore_index=True)
     X, Y = sanitize_input_data(df)
-    
-    
+        
     model = load_predictor_model(name)
         
     return str(model.predict_proba(X)[-1][1])
         
 
+def main(request):
+    request_json = request.get_json()
+    if request.args and 'message' in request.args:
+        import base64
+        x = request.args.get('message')
+        params = eval(base64.b64decode(x))
+        return get_prediction(params['inp'], params['name'])
 
-# In[14]:
-
-inp = {
-    'ID':1, 
-    'age':21, 
-    'gender':"male", 
-    'weight':190, 
-    'num_task_pending':0,
-    'average_task_completion_delay':5, 
-    'avg_sleep':8, 
-    'calories_eaten':2000,
-    'water_drank':10, 
-    'lunch_cafeteria_or_other':'c', 
-    'percent_work_done_in_teams':"100%",
-    'public_transit_commute':"y", 
-    'entry time':9, 
-    'exit time':6, 
-    'hours':8, 
-    'height':168,
-    'num_breaks':10, 
-    'season':"spring", 
-    'location':"SF", 
-    'has_roommates':"y", 
-    'num_laundry':"0",
-}
-
-get_prediction(inp, "allergy")
+    return f'Error In Parameter'
 
 
 # In[ ]:
