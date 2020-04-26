@@ -12,7 +12,9 @@
     <div class="dashboard mr2 flex flex-column">
       <div>
         <h1>Welcome, {{data["dep-name"]}} Manager {{data["admin-name"]}}</h1>
-        <h3 class="mt2 mb2"> Updates: {{data["dep-name"]}} department's wellness has increased 5% </h3>
+        <h3 class="mt2 mb2"> Updates: {{data["dep-name"]}} department's predicted depression is {{data["depression"]}}</h3>
+        <h3 class="mt2 mb2"> Updates: {{data["dep-name"]}} department's predicted carpal tunnel is {{data["ct"]}}</h3>
+        <h3 class="mt2 mb2"> Updates: {{data["dep-name"]}} department's predicted lombago is {{data["lombago"]}}</h3>
       </div>
       <h1 class="mt2 mb2">Overview</h1>
       <div class="flex flex-row mb1">
@@ -61,8 +63,6 @@
         {{ script_ph |safe }}
       </div>
 
-
-
       <div class="flex mt3 bg-white pa4 flex-column items-center">
         <h2 class="mb4">Recommended Action Plans</h2>
         <div class="flex flex-row mb1">
@@ -70,6 +70,7 @@
             <div class="mb4">
               <h2 class="white">{{actions["action1-name"]}}</h2>
               <h3 class="white mt2">{{actions["action1-description"]}}</h3>
+              <a href="https://google.com" class="button">Take Action</a>
             </div>
           </div>
           <div class="tile bg-gray ml1 mr1 pa4 flex flex-column items-center">

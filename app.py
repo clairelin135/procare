@@ -160,7 +160,10 @@ def employer(id):
             'absent': absent,
             'admin-name': admin_name,
             'dep-name': human_m[id],
-            'top-illness': 'depression'
+            'top-illness': 'depression',
+            'depression': '25%',
+            'ct': '15%',
+            'lombago': '25%'
         }
     depression_actions = {
         'action1-name': 'Send Nudges',
@@ -188,7 +191,7 @@ def employer(id):
     return render_template("employer.html", data=doc, actions=actions, script_prod=script_prod, div_prod=div_prod,
     script_em=script_em, div_em=div_em, script_ph=script_ph, div_ph=div_ph)
 
-#stat: emotional_level, physical_wellness, productivity
+# stat: emotional_level, physical_wellness, productivity
 # creates plot for all departments for one stat type
 def create_plot(x, stat):
     y_axis_label = ""
