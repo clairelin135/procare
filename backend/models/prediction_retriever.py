@@ -2,6 +2,7 @@ def get_employee_data(user_id, db):
         doc_ref = db.collection(u'employees').document(u'{}'.format(user_id))
         return doc_ref.get().to_dict()
 
+# State Type options: depression, sad, ct, lombago
 def get_state_prediction(user_id, state_type):
     import requests, os, base64
     import firebase_admin
@@ -60,6 +61,8 @@ def get_state_prediction(user_id, state_type):
     r = requests.get(url, {'message':base64_dict})
     return eval(r.content)
 
+
+# State Type options: cough, fever, sore throat, allergy
 def get_health_prediction(user_id, state_type):
     import requests, os, base64
     import firebase_admin
@@ -109,6 +112,3 @@ def get_health_prediction(user_id, state_type):
 
     r = requests.get(url, {'message':base64_dict})
     return eval(r.content)
-
-
-print(get_health_prediction(1, "cough"))
