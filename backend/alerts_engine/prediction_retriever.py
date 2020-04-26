@@ -73,11 +73,12 @@ def get_health_prediction(user_id, state_type):
     import firebase_admin
     from firebase_admin import credentials
     from firebase_admin import firestore
+    import numpy as np
     cred = credentials.Certificate('key.json')  
     try:
         firebase_admin.initialize_app(cred)
     except:
-        print("Already authenticated!")
+        x = 2
     db = firestore.client()
 
     employee_data = get_employee_data(user_id, db)
@@ -87,8 +88,8 @@ def get_health_prediction(user_id, state_type):
         'age' : employee_data["age"],
         'gender' : employee_data["gender"],
         'weight' : employee_data["weight"],
-        'num_task_pending':employee_data["num_task_pending"][-1]["data"],
-        'average_task_completion_delay':employee_data["num_task_pending"][-1]["data"], 
+        'num_task_pending':employee_data["num_task_pendings"][-1]["data"],
+        'average_task_completion_delay':employee_data["avg_task_delay"][-1]["data"], 
         'avg_sleep':employee_data["sleep"][-1]["data"], 
         'calories_eaten':employee_data["calories_eaten"][-1]["data"],
         'water_drank':employee_data["water_consumed"][-1]["data"], 
@@ -102,9 +103,10 @@ def get_health_prediction(user_id, state_type):
         'num_breaks':np.random.randint(0,25), 
         'season':"spring", 
         'location':"SF", 
-        'has_roommates':employee_data["has_roommates"][-1]["data"], 
+        'has_roommates':employee_data["roommates"], 
         'num_laundry':employee_data["num_laundry"][-1]["data"],
     }
+    
 
     url = "https://us-central1-ieor185-274323.cloudfunctions.net/health_prediction"
     params = {
