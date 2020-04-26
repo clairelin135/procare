@@ -10,6 +10,7 @@ from bokeh.models import DatetimeTickFormatter
 from bokeh.embed import components
 from wtforms import Form, BooleanField
 import requests
+from backend.models.prediction_retriever import get_state_prediction, get_health_prediction
 
 # config = {
 #     "apiKey": "AIzaSyBdvsfqF_yfU5uvbu6tJxqAuU_jZQw86DQ",
@@ -139,25 +140,25 @@ db_m = {'1': 'engineering', '2': 'product-management', '3': 'sales'}
 human_m = {'1': 'Engineering', '2': 'Product', '3': 'Sales'}
 @app.route(EMPLOYER_ROUTE + '<id>', methods=['GET', 'POST'])
 def employer(id):
-    document = db_m[id]
+    department = db_m[id]
+    print(department)
     
-    emo_p = get_weekly_average(document, "emotional_level")
-    pro_p = get_weekly_average(document, "productivity")
-    phy_p = get_weekly_average(document, "physical_wellness")
-    admin_name = get_admin_name(db_m[id])
-    print(emo_p)
-    print(pro_p)
-    print(phy_p)
-
+    emo_p = get_weekly_average(department, "emotional_level")
+    pro_p = get_weekly_average(department, "productivity")
+    phy_p = get_weekly_average(department, "physical_wellness")
+    admin_name = get_attr(department, 'admin_info')
+    attendance = get_attr(department, 'attendance')
+    late = get_attr(department, 'late')
+    absent = get_attr(department, 'absent')
     
     doc = {'emotion-percentage': str(emo_p)+'%',
             'product-percentage': str(pro_p)+'%',
             'physical-percentage': str(phy_p)+'%',
-            'attendance': 300,
-            'late': 10,
-            'absent': 5,
+            'attendance': attendance,
+            'late': late,
+            'absent': absent,
             'admin-name': admin_name,
-            'dep-name': human_m[id]
+            'dep-name': human_m[id],
         }
 
     return render_template("employer.html", data=doc)
@@ -178,62 +179,18 @@ def get_weekly_average(department, stat):
         day -= 1
     return round((total / 7)  * 100)
 
-def get_admin_name(department):
-    doc_ref = db.collection(EMPLOYER_COLLECTION).document('admin_info')
+def get_attr(department, attr):
+    doc_ref = db.collection(EMPLOYER_COLLECTION).document(attr)
     doc = doc_ref.get().to_dict()
     return doc[department]
-        
     
 @app.route("/predict", methods=['GET'])
 def predict():
     body = request.json
     id = body['id']
-    doc_ref = db.collection(EMPLOYEE_COLLECTION).document(str(id))
-    doc = doc_ref.get()
-
-    inp = {
-        'ID':0, 
-        'age':21, 
-        'gender':"male", 
-        'body_fat_percentage':12, 
-        'height':169, 
-        'weight':200,
-        'num_breaks':5, 
-        'num_task_pending':234, 
-        'average_task_completion_delay':1000,
-        'calories_eaten':500, 
-        'morning push percentage':0.2,
-        'afternoon push percentage':0.6, 
-        'evening push percentage':0.2,
-        'git_avg_push_time_difference':10, 
-        'average_chat_tone':'Angry',
-        'ergonomic_risk_rating':5, 
-        'number of times standing':1,
-        'minutes_worked_out':0, 
-        'average_heart_rate':180, 
-        'traffic condition':'Red',
-        'chat-words':"bad", 
-        'location':"77494", 
-        'workplace temperature':"23", 
-        'weather':"rainy",
-        'entry time':3, 
-        'exit time':23, 
-        'stock_ticker':"GOOG", 
-        'stock':"-35%", 
-        'hours':40
-    }
-
-    if doc.exists:
-        employee_m = doc.to_dict()
-        url = "https://us-central1-ieor185-274323.cloudfunctions.net/state_prediction?message=eydpbnAnOiB7J0lEJzogMCwgJ2FnZSc6IDIxLCAnZ2VuZGVyJzogJ21hbGUnLCAnYm9keV9mYXRfcGVyY2VudGFnZSc6IDEyLCAnaGVpZ2h0JzogMCwgJ3dlaWdodCc6IDAsICdudW1fYnJlYWtzJzogNSwgJ251bV90YXNrX3BlbmRpbmcnOiAyMzQsICdhdmVyYWdlX3Rhc2tfY29tcGxldGlvbl9kZWxheSc6IDAsICdjYWxvcmllc19lYXRlbic6IDAsICdtb3JuaW5nIHB1c2ggcGVyY2VudGFnZSc6IDAuMiwgJ2FmdGVybm9vbiBwdXNoIHBlcmNlbnRhZ2UnOiAwLjYsICdldmVuaW5nIHB1c2ggcGVyY2VudGFnZSc6IDAuMiwgJ2dpdF9hdmdfcHVzaF90aW1lX2RpZmZlcmVuY2UnOiAxMCwgJ2F2ZXJhZ2VfY2hhdF90b25lJzogJ0FuZ3J5JywgJ2VyZ29ub21pY19yaXNrX3JhdGluZyc6IDUsICdudW1iZXIgb2YgdGltZXMgc3RhbmRpbmcnOiAxLCAnbWludXRlc193b3JrZWRfb3V0JzogMCwgJ2F2ZXJhZ2VfaGVhcnRfcmF0ZSc6IDE4MCwgJ3RyYWZmaWMgY29uZGl0aW9uJzogJ1JlZCcsICdjaGF0LXdvcmRzJzogJ2JhZCcsICdsb2NhdGlvbic6ICc3NzQ5NCcsICd3b3JrcGxhY2UgdGVtcGVyYXR1cmUnOiAnMjMnLCAnd2VhdGhlcic6ICdyYWlueScsICdlbnRyeSB0aW1lJzogMywgJ2V4aXQgdGltZSc6IDMsICdzdG9ja190aWNrZXInOiAnR09PRycsICdzdG9jayc6IC0wLjAxLCAnaG91cnMnOiA0MH0sICduYW1lJzogJ2RlcHJlc3Npb24nfQ=="
-        params = {
-            'inp': employee_m,
-            'name': 'depression'
-        }
-        r = requests.get(url, params)
-        return r
-    else:
-        return f"Employee id does not exist"
+    return jsonify({
+        'p': get_state_prediction(str(id), 'depression')
+    })
 
 # main
 port = int(os.environ.get('PORT', 8080))
