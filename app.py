@@ -11,7 +11,7 @@ from bokeh.embed import components
 from wtforms import Form, BooleanField
 import requests
 import datetime
-#from backend.models.prediction_retriever import get_state_prediction, get_health_prediction
+from backend.models.prediction_retriever import get_state_prediction, get_health_prediction
 
 # config = {
 #     "apiKey": "AIzaSyBdvsfqF_yfU5uvbu6tJxqAuU_jZQw86DQ",
@@ -188,9 +188,6 @@ def employer(id):
     return render_template("employer.html", data=doc, actions=actions, script_prod=script_prod, div_prod=div_prod,
     script_em=script_em, div_em=div_em, script_ph=script_ph, div_ph=div_ph)
 
-# document: [product-management, engineering, sales]
-# stat: [emotional_level, productivity, physical_wellness]
-
 #stat: emotional_level, physical_wellness, productivity
 # creates plot for all departments for one stat type
 def create_plot(x, stat):
@@ -240,6 +237,8 @@ def get_x_axis():
         day -= 1
     return x
 
+# deparatment: [product-management, engineering, sales]
+# stat: [emotional_level, productivity, physical_wellness]
 def get_weekly_average(department, stat):
     total = 0
     day = 21
