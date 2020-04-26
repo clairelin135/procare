@@ -11,7 +11,7 @@ from bokeh.embed import components
 from wtforms import Form, BooleanField
 import requests
 import datetime
-from backend.models.prediction_retriever import get_state_prediction, get_health_prediction
+from backend.models.prediction_retriever import get_state_prediction, get_health_prediction #uncomment before push
 
 # config = {
 #     "apiKey": "AIzaSyBdvsfqF_yfU5uvbu6tJxqAuU_jZQw86DQ",
@@ -59,7 +59,7 @@ def index():
             "route": EMPLOYEE_ROUTE + str(doc.id)
         }
         employees.append(employee)
-    
+
     for i in range(1, len(db_m)+1):
         name = human_m[str(i)]
         employer = {
@@ -152,14 +152,21 @@ def employer(id):
     attendance = get_attr(department, 'attendance')
     late = get_attr(department, 'late')
     absent = get_attr(department, 'absent')
-    percentages = ill_percentages(department)
+    percentages = ill_percentages(department) #uncomment before push
+    #percentages = {'depression': 15, 'ct': 25, 'lombago': 20} #comment before push
     top_illness = None
     top_perc = 0
     for k, v in percentages.items():
         if v > top_perc:
             top_perc = v
             top_illness = k
-    
+    if top_illness == 'ct':
+        top_illness_name = 'Carpal Tunnel - Numbness/Tingling of the wrist'
+    elif top_illness == 'depression':
+        top_illness_name = 'Depression'
+    elif top_illness == 'lombago':
+        top_illness_name = 'Lombago - Lower back pain'
+
     doc = {'emotion-percentage': str(emo_p)+'%',
             'product-percentage': str(pro_p)+'%',
             'physical-percentage': str(phy_p)+'%',
@@ -169,6 +176,7 @@ def employer(id):
             'admin-name': admin_name,
             'dep-name': human_m[id],
             'top-illness': top_illness,
+            'top-illness-name': top_illness_name,
             'depression': str(percentages['depression'])+'%',
             'ct': str(percentages['ct'])+'%',
             'lombago': str(percentages['lombago'])+'%'
@@ -286,8 +294,8 @@ def get_x_axis():
         x.insert(0, datetime.datetime(2020, 4, day))
         day -= 1
     return x
-    
-    
+
+
 @app.route("/predict", methods=['GET'])
 def predict():
     body = request.json

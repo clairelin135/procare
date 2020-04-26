@@ -34,25 +34,25 @@ a:hover {
       <h1 class="mt2 mb2">Overview</h1>
       <div class="flex flex-row mb1">
         <div class="tile bg-blue mr1 pa4 flex flex-column items-center">
-          <div class="mb4">
+          <div class="mb4 tc">
             <h2 class="white">Productivity</h2>
-            <h3 class="white mt2">Across department</h3>
+            <h3 class="white mt2">Across {{data["dep-name"]}} department</h3>
           </div>
             <h1 class="white mt2">{{data["product-percentage"]}}</h1>
         </div>
         <div class="tile bg-gold ml1 mr1 pa4 flex flex-column items-center">
-          <div class="mb4 items-center">
+          <div class="mb4 tc">
             <h2 class="white">Emotional Level</h2>
-            <h3 class="white mt2">Across department</h3>
+            <h3 class="white mt2">Across {{data["dep-name"]}} department</h3>
           </div>
           <h1 class="white mt2">{{data["emotion-percentage"]}}</h1>
         </div>
         <div class="tile bg-light-green ml1 pa4 flex flex-column items-center">
-          <div class="mb4 items-center">
+          <div class="mb4 tc">
             <h2 class="white">Physical Wellness</h2>
-            <h3 class="white mt2">Across department</h3>
+            <h3 class="white mt2">Across {{data["dep-name"]}} department</h3>
           </div>
-          <h1 class="white mt2">{{data["physical-percentage"]}}</h1>
+          <h1 class="white">{{data["physical-percentage"]}}</h1>
         </div>
       </div>
 
@@ -79,10 +79,14 @@ a:hover {
       </div>
 
       <div class="flex mt3 bg-white pa4 flex-column items-center">
-        <h2 class="mb4">Recommended Action Plans</h2>
+        <h2 class="mb3">Recommended Action Plans</h2>
+        <h3 class="mb1">Department Diagnosis:</h3>
+        <h3 class="mb4">{{data["top-illness-name"]}}</h3>
+
+
         <div class="flex flex-row mb1">
           <div class="tile bg-gray mr1 pa4 flex flex-column items-center">
-            <div class="mb4">
+            <div class="mb4 tc">
               <h2 class="white">{{actions["action1-name"]}}</h2>
               <h3 class="white mt2">{{actions["action1-description"]}}</h3>
               <br>
@@ -91,7 +95,7 @@ a:hover {
             </div>
           </div>
           <div class="tile bg-gray ml1 mr1 pa4 flex flex-column items-center">
-            <div class="mb4">
+            <div class="mb4 tc">
               <h2 class="white">{{actions["action2-name"]}}</h2>
               <h3 class="white mt2">{{actions["action2-description"]}}</h3>
               <br>
@@ -100,7 +104,7 @@ a:hover {
             </div>
           </div>
           <div class="tile bg-gray ml1 pa4 flex flex-column items-center">
-            <div class="mb4">
+            <div class="mb4 tc">
               <h2 class="white">{{actions["action3-name"]}}</h2>
               <h3 class="white mt2">{{actions["action3-description"]}}</h3>
               <br>
