@@ -122,28 +122,29 @@ class Employee:
 
 
 # For Data Generation
-# cred = credentials.Certificate('key.json')
-# firebase_admin.initialize_app(cred)
+cred = credentials.Certificate('key.json')
+firebase_admin.initialize_app(cred)
 
-# e = Employee(name="Sudarshan", 
-#         id=1,
-#         age=21, 
-#         gender="male", 
-#         bodyfat="22", 
-#         height="168", 
-#         weight="190", 
-#         zipcode="94704", 
-#         department="Engineering", 
-#         team="Infrastructure", 
-#         stock_symbol="GOOG"
-#     )
+for user_id in range(100, 125):
+    print("user id:", user_id)
+    e = Employee(name="Sudarshan", 
+            id=user_id,
+            age=21, 
+            gender="male", 
+            bodyfat="22", 
+            height="168", 
+            weight="190", 
+            zipcode="94704", 
+            department="Engineering", 
+            team="Infrastructure", 
+            stock_symbol="GOOG"
+        )
 
-# for i in range(96):
-#     e.run_every_15_mins()
+    for i in range(96):
+        e.run_every_15_mins()
 
-#     if i % 96 == 0:
-#         print(i)
-#         e.run_every_day()
+        if i % 96 == 0:
+            e.run_every_day()
 
 # # -------------------------
 

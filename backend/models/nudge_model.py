@@ -14,7 +14,7 @@ class NudgePackage:
         self.displayed = False
 
     def send(self):
-        cred = credentials.Certificate('ieor185-274323-e16b83ee9351.json')
+        cred = credentials.Certificate('key.json')
         firebase_admin.initialize_app(cred)
 
         db = firestore.client()
@@ -27,7 +27,7 @@ class NudgeManager:
         self.user_id = user_id
     
     def get_data_from_firestore(self):
-        cred = credentials.Certificate('ieor185-274323-e16b83ee9351.json')
+        cred = credentials.Certificate('key.json')
         firebase_admin.initialize_app(cred)
 
         db = firestore.client()

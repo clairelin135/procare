@@ -9,7 +9,10 @@ def get_state_prediction(user_id, state_type):
     from firebase_admin import credentials
     from firebase_admin import firestore
     cred = credentials.Certificate('key.json')  
-    firebase_admin.initialize_app(cred)
+    try:
+        firebase_admin.initialize_app(cred)
+    except:
+        print("Already authenticated!")
     db = firestore.client()
 
     employee_data = get_employee_data(user_id, db)
@@ -68,7 +71,10 @@ def get_health_prediction(user_id, state_type):
     from firebase_admin import credentials
     from firebase_admin import firestore
     cred = credentials.Certificate('key.json')  
-    firebase_admin.initialize_app(cred)
+    try:
+        firebase_admin.initialize_app(cred)
+    except:
+        print("Already authenticated!")
     db = firestore.client()
 
     employee_data = get_employee_data(user_id, db)
