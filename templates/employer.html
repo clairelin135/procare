@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block name %} Lara Chu {% endblock %}
+{% block name %} {{data["admin-name"]}} {% endblock %}
 {% block html_head %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard.css') }}"/>
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/circle.css') }}"/>
@@ -11,8 +11,8 @@
   <div class="mt1 flex flex-row">
     <div class="dashboard mr2 flex flex-column">
       <div>
-        <h1>Welcome, HR Manager Lara Chu</h1>
-        <h3 class="mt2 mb2"> Updates: Engineering department's wellness has increased 5% </h3>
+        <h1>Welcome, {{data["dep-name"]}} Manager {{data["admin-name"]}}</h1>
+        <h3 class="mt2 mb2"> Updates: {{data["dep-name"]}} department's wellness has increased 5% </h3>
       </div>
       <h1 class="mt2 mb2">Overview</h1>
       <div class="flex flex-row mb1">
@@ -38,7 +38,7 @@
             <h3 class="white mt2">Across Customer Success, Engineering, Product
             Management, and Sales departments</h3>
           </div>
-          <h1 class="white mt2">{{data["nutrition-percentage"]}}</h1>
+          <h1 class="white mt2">{{data["physical-percentage"]}}</h1>
         </div>
       </div>
       <div class="flex mt3 bg-white pa4 flex-column items-center">
