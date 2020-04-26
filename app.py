@@ -153,7 +153,7 @@ def employer(id):
     late = get_attr(department, 'late')
     absent = get_attr(department, 'absent')
     percentages = ill_percentages(department) #uncomment before push
-    #percentages = {'depression': 15, 'ct': 25, 'lombago': 20} #comment before push
+    # percentages = {'depression': 15, 'ct': 25, 'lombago': 20} #comment before push
     top_illness = None
     top_perc = 0
     for k, v in percentages.items():
@@ -275,9 +275,12 @@ def create_plot(x, stat):
                     sal.append(json_doc[stat])
 
     p = figure(x_axis_type="datetime", y_range=(0, 1), plot_width=550, plot_height=300)
-    p.line(x, eng, line_width=2, line_color="#8CCFBB") #eng is green
-    p.line(x, pm, line_width=2, line_color="#eaadbd") #pm is pink
-    p.line(x, sal, line_width=2, line_color="#ffa751") #sales is orange
+    p.line(x, eng, line_width=2, line_color="#8CCFBB", legend_label="Engineering") #eng is green
+    p.line(x, pm, line_width=2, line_color="#eaadbd", legend_label="Product Management") #pm is pink
+    p.line(x, sal, line_width=2, line_color="#ffa751", legend_label="Sales") #sales is orange
+    p.legend.title = 'Departments'
+    p.legend.location = 'bottom_right'
+    p.legend.click_policy = 'hide'
     p.toolbar_location = None
     p.xaxis.axis_label = "Day"
     p.yaxis.axis_label = y_axis_label
