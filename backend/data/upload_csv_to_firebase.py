@@ -9,7 +9,7 @@ firebase_admin.initialize_app(cred)
 
 db = firestore.client()
 
-d = pd.read_csv("data/state_prediction.csv").to_dict("index")
+d = pd.read_csv("state_prediction.csv").to_dict("index")
 
 
 for r in d:
@@ -20,7 +20,7 @@ doc_ref = db.collection(u'state_prediction').document(u'metadata')
 doc_ref.set({"row_count": len(d)})
 
 
-d = pd.read_csv("data/health_prediction.csv").to_dict("index")
+d = pd.read_csv("health_prediction.csv").to_dict("index")
 
 
 for r in d:
