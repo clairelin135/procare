@@ -4,6 +4,21 @@
 {% block html_head %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard.css') }}"/>
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/circle.css') }}"/>
+<style>
+a.button {
+  background-color: red;
+  color: white;
+  padding: 1em 1.5em;
+  text-decoration: none;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+a:hover {
+  background-color: #555;
+}
+</style>
 {% endblock %}
 
 {% block content %}
@@ -26,14 +41,14 @@
             <h1 class="white mt2">{{data["product-percentage"]}}</h1>
         </div>
         <div class="tile bg-gold ml1 mr1 pa4 flex flex-column items-center">
-          <div class="mb4">
+          <div class="mb4 items-center">
             <h2 class="white">Emotional Level</h2>
             <h3 class="white mt2">Across department</h3>
           </div>
           <h1 class="white mt2">{{data["emotion-percentage"]}}</h1>
         </div>
         <div class="tile bg-light-green ml1 pa4 flex flex-column items-center">
-          <div class="mb4">
+          <div class="mb4 items-center">
             <h2 class="white">Physical Wellness</h2>
             <h3 class="white mt2">Across department</h3>
           </div>
@@ -70,19 +85,27 @@
             <div class="mb4">
               <h2 class="white">{{actions["action1-name"]}}</h2>
               <h3 class="white mt2">{{actions["action1-description"]}}</h3>
-              <a href="https://google.com" class="button">Take Action</a>
+              <br>
+              <br>
+              <a href="{{actions['action1-link']}}" class="button">Take Action</a>
             </div>
           </div>
           <div class="tile bg-gray ml1 mr1 pa4 flex flex-column items-center">
             <div class="mb4">
               <h2 class="white">{{actions["action2-name"]}}</h2>
               <h3 class="white mt2">{{actions["action2-description"]}}</h3>
+              <br>
+              <br>
+              <a href="{{actions['action2-link']}}" class="button">Take Action</a>
             </div>
           </div>
           <div class="tile bg-gray ml1 pa4 flex flex-column items-center">
             <div class="mb4">
               <h2 class="white">{{actions["action3-name"]}}</h2>
               <h3 class="white mt2">{{actions["action3-description"]}}</h3>
+              <br>
+              <br>
+              <a href="{{actions['action3-link']}}" class="button">Take Action</a>
             </div>
           </div>
         </div>
