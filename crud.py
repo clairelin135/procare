@@ -78,3 +78,18 @@ def delete_employee():
         return jsonify({"success": True}), 200
     except Exception as e:
         return f"An Error Occured: {e}"
+
+@app.route('/doshit')
+def doshit():
+    names = ['engineering', 'product-management', 'sales']
+    # docs = ['admin_info', 'absent', 'attendance', 'late']
+    levels = ['emotional_level', 'physical_wellness', 'productivity']
+    for n in names:
+        doc_ref = db.collection(EMPLOYER_COLLECTION).document(n)
+        day = 21
+        for _ in range(7):
+            d = '2020-04-' + str(day)
+            employer_ref = db.collection(EMPLOYER_COLLECTION).document(d).collection(n).document().get().to_dict()
+            for l in levels:
+                doc_ref.update({l: employer_ref[n]})
+    return 'success'
