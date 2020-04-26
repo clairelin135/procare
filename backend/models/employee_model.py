@@ -121,72 +121,73 @@ class Employee:
         self.store_employee_to_firebase()
 
 
-cred = credentials.Certificate('ieor185-274323-e16b83ee9351.json')
-firebase_admin.initialize_app(cred)
+# For Data Generation
+# cred = credentials.Certificate('key.json')
+# firebase_admin.initialize_app(cred)
 
-e = Employee(name="Sudarshan", 
-        id=1,
-        age=21, 
-        gender="male", 
-        bodyfat="22", 
-        height="168", 
-        weight="190", 
-        zipcode="94704", 
-        department="Engineering", 
-        team="Infrastructure", 
-        stock_symbol="GOOG"
-    )
+# e = Employee(name="Sudarshan", 
+#         id=1,
+#         age=21, 
+#         gender="male", 
+#         bodyfat="22", 
+#         height="168", 
+#         weight="190", 
+#         zipcode="94704", 
+#         department="Engineering", 
+#         team="Infrastructure", 
+#         stock_symbol="GOOG"
+#     )
 
-for i in range(96):
-    e.run_every_15_mins()
+# for i in range(96):
+#     e.run_every_15_mins()
 
-    if i % 96 == 0:
-        print(i)
-        e.run_every_day()
+#     if i % 96 == 0:
+#         print(i)
+#         e.run_every_day()
 
-# -------------------------
+# # -------------------------
 
-e = Employee(name="Sudarshan's Clone 2", 
-        id=2,
-        age=21, 
-        gender="male", 
-        bodyfat="22", 
-        height="168", 
-        weight="190", 
-        zipcode="94704", 
-        department="Engineering", 
-        team="Infrastructure", 
-        stock_symbol="GOOG"
-    )
+# e = Employee(name="Sudarshan's Clone 2", 
+#         id=2,
+#         age=21, 
+#         gender="male", 
+#         bodyfat="22", 
+#         height="168", 
+#         weight="190", 
+#         zipcode="94704", 
+#         department="Engineering", 
+#         team="Infrastructure", 
+#         stock_symbol="GOOG"
+#     )
 
-for i in range(96 * 2):
-    e.run_every_15_mins()
+# for i in range(96 * 2):
+#     e.run_every_15_mins()
 
-    if i % 96 == 0:
-        print(i)
-        e.run_every_day()
+#     if i % 96 == 0:
+#         print(i)
+#         e.run_every_day()
 
-# -------------------------
+# # -------------------------
 
-e = Employee(name="Sudarshan's Clone 3", 
-        id=3,
-        age=21, 
-        gender="male", 
-        bodyfat="22", 
-        height="168", 
-        weight="190", 
-        zipcode="94704", 
-        department="Engineering", 
-        team="Infrastructure", 
-        stock_symbol="GOOG"
-    )
+# e = Employee(name="Sudarshan's Clone 3", 
+#         id=3,
+#         age=21, 
+#         gender="male", 
+#         bodyfat="22", 
+#         height="168", 
+#         weight="190", 
+#         zipcode="94704", 
+#         department="Engineering", 
+#         team="Infrastructure", 
+#         stock_symbol="GOOG"
+#     )
 
-for i in range(96 * 5):
-    e.run_every_15_mins()
+# for i in range(96 * 5):
+#     e.run_every_15_mins()
 
-    if i % 96 == 0:
-        print(i)
-        e.run_every_day()
+#     if i % 96 == 0:
+#         print(i)
+#         e.run_every_day()
 
 
 

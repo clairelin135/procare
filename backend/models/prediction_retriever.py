@@ -52,7 +52,6 @@ def get_state_prediction(user_id, state_type):
         'name': state_type
     }
 
-    import base64
 
     encoded_dict = str(params).encode('utf-8')
 
@@ -104,7 +103,6 @@ def get_health_prediction(user_id, state_type):
         'name': state_type
     }
 
-    import base64
 
     encoded_dict = str(params).encode('utf-8')
 

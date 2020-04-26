@@ -26,7 +26,7 @@ def set_new_rowcount(db, r):
 
 # State Type options: depression, sad, ct, lombago
 def get_state_prediction(db, user_id, state_type, predictor_data):
-    import requests, os, base64
+    import requests, base64
 
     employee_data = get_employee_data(user_id, db)
 
@@ -105,7 +105,7 @@ def get_user_data_for_state_prediction(db, user_id):
 
     return predictor_data
 
-def run_state_pipelien(user_id):
+def run_state_pipeline(user_id):
     db = firestore.client()
 
     df = get_user_data_for_state_prediction(db, user_id)
@@ -119,3 +119,12 @@ def run_state_pipelien(user_id):
     r = get_state_prediction_meta(db)
     set_new_datastream(db, predictor_data, r)
     set_new_rowcount(db, r)
+
+def main(request):
+    request_json = request.get_json()
+    if request.args and 'message' in request.args:
+        import base64
+        user_id = request.args.get('message')
+        return run_health_pipeline(user_id)
+
+    return f'Error In Parameter'
