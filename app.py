@@ -59,7 +59,7 @@ def index():
             "route": EMPLOYEE_ROUTE + str(doc.id)
         }
         employees.append(employee)
-    
+
     for i in range(1, len(db_m)+1):
         name = human_m[str(i)]
         employer = {
@@ -67,7 +67,7 @@ def index():
             'route': EMPLOYER_ROUTE + str(i)
         }
         employers.append(employer)
-    
+
     return render_template("index.html", employees=employees, employers=employers)
 
 
