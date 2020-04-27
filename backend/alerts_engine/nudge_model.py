@@ -12,8 +12,8 @@ class NudgePackage:
         self.nudge_time = nudge_time
         self.nudge_question = nudge_question
         self.nudge_response = "Response Goes Here"
-        self.response = None
-        self.displayed = False
+        self.responded = False
+        self.accepted = False
 
     def send(self):
         db = firestore.client()
