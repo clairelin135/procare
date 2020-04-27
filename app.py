@@ -44,6 +44,8 @@ NUDGE_COLLECTION = "nudges"
 EMPLOYER_ROUTE = "/employer/"
 EMPLOYEE_ROUTE = "/employee/"
 
+DEPARTMENTS = ["engineering", "product-management", "sales"]
+
 # given collection, and document, adds an name/age entry into db
 @app.route('/add', methods=['POST'])
 def create_employee():
@@ -136,15 +138,20 @@ def index():
             "route": EMPLOYEE_ROUTE + str(doc.id)
         }
         employees.append(employee)
+    
+    for department in DEPARTMENTS:
+        try:
+            doc = db.collection(EMPLOYER_COLLECTION).document(department).get()
 
-    # employer_docs = db.collection(EMPLOYER_COLLECTION).stream()
-    # for doc in employer_docs:
-    #     json_doc = doc.to_dict()
-    #     employer = {
-    #         "name": json_doc["name"]
-    #         "id": doc.id
-    #     }
-    #     employers.append(employer)
+            if doc.exists:
+                doc = doc.to_dict()
+                employer = {
+                    "name": doc["admin_info"]
+                }
+                employers.append(employer)
+                
+        except Exception as e:
+            return f"An Error Occured: {e}"
     
     return render_template("index.html", employees=employees, employers=employers)
 
@@ -157,7 +164,7 @@ def employee(id):
     # Fetch nudges and add to document
     nudges = []
     point_count = 0
-    nudges_ref = db.collection(NUDGE_COLLECTION + "-1").stream()
+    nudges_ref = db.collection(NUDGE_COLLECTION + "-" + str(id)).stream()
     for nudge in nudges_ref:
         nudge_id = nudge.id
         nudge = nudge.to_dict()
@@ -194,7 +201,7 @@ def employee(id):
         doc["points"] = point_count
         doc["tree_height"] = str(min(500, 150 + point_count * 50)) + "px"
 
-        doc["water_percentage"] = round(round(120/600, 2)*100)
+        doc["water_percentage"] = round(round(doc["water_consumed"][0]["data"]/8, 2)*100)
         doc["focus_percentage"] = round(round(55/120, 2)*100)
 
         break_duration_len = min(32, len(doc["break_durations"]))
@@ -203,6 +210,10 @@ def employee(id):
         for b in doc["break_durations"][-break_duration_len:]:
             x.append(b["time"])
             y.append(sum(b["data"]))
+
+        doc["min_focused"] = sum(doc["focustimes"][len(doc["focustimes"]) - 1]["data"])
+        doc["min_remaining"] = 15 - doc["min_focused"]
+        doc["min_percentage"] = round(round(doc["min_focused"]/15, 2)*100)
 
         p = figure(plot_width=550, plot_height=300)
 
@@ -219,7 +230,7 @@ def employee(id):
     else:
         return f"User does not exist"
 
-@app.route(EMPLOYER_ROUTE + '<id>')
+@app.route(EMPLOYER_ROUTE)
 def employer():
     # collection = "employers"
     # document = "2020-04-16"
