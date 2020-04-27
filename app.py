@@ -51,7 +51,7 @@ def index():
     employees = []
     employers = []
 
-    employee_docs = db.collection(EMPLOYEE_COLLECTION).stream()
+    employee_docs = db.collection(EMPLOYEE_COLLECTION).get()
     for doc in employee_docs:
         json_doc = doc.to_dict()
         employee = {
@@ -79,7 +79,7 @@ def employee(id):
     # Fetch nudges and add to document
     nudges = []
     point_count = 0
-    nudges_ref = db.collection(NUDGE_COLLECTION + "-" + str(id)).stream()
+    nudges_ref = db.collection(NUDGE_COLLECTION + "-" + str(id)).get()
     for nudge in nudges_ref:
         nudge_id = nudge.id
         nudge = nudge.to_dict()
@@ -218,7 +218,7 @@ def get_weekly_average(department, stat):
     day = 21
     for _ in range(7):
         date = "2020-04-" + str(day)
-        doc_stream = db.collection(EMPLOYER_COLLECTION).document(date).collection(department).stream()
+        doc_stream = db.collection(EMPLOYER_COLLECTION).document(date).collection(department).get()
         for doc in doc_stream:
             json_doc = doc.to_dict()
             p = json_doc[stat]
@@ -234,7 +234,7 @@ def get_attr(department, attr):
 
 # retrieves the percentages of depression, ct, and lombago, given department
 def ill_percentages(department):
-    employee_docs = db.collection(EMPLOYEE_COLLECTION).stream()
+    employee_docs = db.collection(EMPLOYEE_COLLECTION).get()
     depression = 0
     ct = 0
     lombago = 0
@@ -268,7 +268,7 @@ def create_plot(x, stat):
     sal = []
     for date in x:
         for dept in ['engineering', 'product-management', 'sales']:
-            doc_stream = db.collection(EMPLOYER_COLLECTION).document(date.strftime("%Y-%m-%d")).collection(dept).stream()
+            doc_stream = db.collection(EMPLOYER_COLLECTION).document(date.strftime("%Y-%m-%d")).collection(dept).get()
             for doc in doc_stream:
                 json_doc = doc.to_dict()
                 if dept == 'engineering':

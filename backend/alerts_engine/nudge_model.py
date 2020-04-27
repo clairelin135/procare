@@ -64,7 +64,7 @@ class NudgeManager:
                 depression_check = any([get_state_prediction(x["id"], "depression") > self.depression_thresh for x in self.employees[dept][team]])
                 sad_check = any([get_state_prediction(x["id"], "sad") > self.sad_thresh for x in self.employees[dept][team]])
 
-                if depression_check or lombago_check:
+                if depression_check or sad_check:
                     nudges += [NudgePackage(x["id"], now(), "Have you considered some team bonding time?") for x in self.employees[dept][team]]
 
                 lombago_check = any([get_state_prediction(x["id"], "lombago") > self.lombago_thresh for x in self.employees[dept][team]])
