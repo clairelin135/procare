@@ -11,11 +11,7 @@ from bokeh.embed import components
 from wtforms import Form, BooleanField
 import requests
 import datetime
-<<<<<<< HEAD
-from .backend.models.prediction_retriever import get_state_prediction, get_health_prediction #uncomment before push
-=======
-from backend.models.prediction_retriever import get_state_prediction, get_health_prediction #uncomment before push
->>>>>>> fe97fd797f93c164d4066fee524d47ec3bc22faf
+from .backend.models.prediction_retriever import get_state_prediction, get_health_prediction
 
 # config = {
 #     "apiKey": "AIzaSyBdvsfqF_yfU5uvbu6tJxqAuU_jZQw86DQ",
