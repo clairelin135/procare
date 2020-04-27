@@ -93,3 +93,14 @@ def doshit():
             for l in levels:
                 doc_ref.update({l: employer_ref[n]})
     return 'success'
+
+# config = {
+#     "apiKey": "AIzaSyBdvsfqF_yfU5uvbu6tJxqAuU_jZQw86DQ",
+#     "authDomain": "ieor185-274323.firebaseapp.com",
+#     "databaseURL": "https://ieor185-274323.firebaseio.com",
+#     "projectId": "ieor185-274323",
+#     "storageBucket": "ieor185-274323.appspot.com",
+#     "messagingSenderId": "746504989082",
+#     "appId": "1:746504989082:web:43f738d1eaa972e1913223",
+#     "measurementId": "G-1SCRZGN73Q"
+# }

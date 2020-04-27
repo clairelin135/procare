@@ -13,17 +13,6 @@ import requests
 import datetime
 from backend.models.prediction_retriever import get_state_prediction, get_health_prediction
 
-# config = {
-#     "apiKey": "AIzaSyBdvsfqF_yfU5uvbu6tJxqAuU_jZQw86DQ",
-#     "authDomain": "ieor185-274323.firebaseapp.com",
-#     "databaseURL": "https://ieor185-274323.firebaseio.com",
-#     "projectId": "ieor185-274323",
-#     "storageBucket": "ieor185-274323.appspot.com",
-#     "messagingSenderId": "746504989082",
-#     "appId": "1:746504989082:web:43f738d1eaa972e1913223",
-#     "measurementId": "G-1SCRZGN73Q"
-# }
-
 # Initialize Flask App
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
@@ -156,8 +145,7 @@ def employer(id):
     attendance = get_attr(department, 'attendance')
     late = get_attr(department, 'late')
     absent = get_attr(department, 'absent')
-    percentages = ill_percentages(department) #uncomment before push
-    # percentages = {'depression': 15, 'ct': 25, 'lombago': 20} #comment before push
+    percentages = ill_percentages(department)
     top_illness = None
     top_perc = 0
     for k, v in percentages.items():
@@ -247,9 +235,6 @@ def ill_percentages(department):
         ct += get_state_prediction(json_doc['id'], 'ct')
         lombago +=  get_state_prediction(json_doc['id'], 'lombago')
         c += 1
-    print(depression)
-    print(ct)
-    print(lombago)
     return {'depression': round((depression / c) * 100), 'ct': round((ct / c) * 100), 'lombago': round((lombago / c) * 100)}
 
 # stat: emotional_level, physical_wellness, productivity
@@ -301,15 +286,6 @@ def get_x_axis():
         x.insert(0, datetime.datetime(2020, 4, day))
         day -= 1
     return x
-
-
-@app.route("/predict", methods=['GET'])
-def predict():
-    body = request.json
-    id = body['id']
-    return jsonify({
-        'p': get_state_prediction(str(id), 'depression')
-    })
 
 # main
 port = int(os.environ.get('PORT', 8080))
