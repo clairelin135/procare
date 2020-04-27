@@ -11,7 +11,7 @@ from bokeh.embed import components
 from wtforms import Form, BooleanField
 import requests
 import datetime
-from backend.models.prediction_retriever import get_state_prediction, get_health_prediction #uncomment before push
+from .backend.models.prediction_retriever import get_state_prediction, get_health_prediction
 
 # config = {
 #     "apiKey": "AIzaSyBdvsfqF_yfU5uvbu6tJxqAuU_jZQw86DQ",
@@ -79,7 +79,7 @@ def employee(id):
     # Fetch nudges and add to document
     nudges = []
     point_count = 0
-    nudges_ref = db.collection(NUDGE_COLLECTION + "-1").stream()
+    nudges_ref = db.collection(NUDGE_COLLECTION + "-" + str(id)).stream()
     for nudge in nudges_ref:
         nudge_id = nudge.id
         nudge = nudge.to_dict()
@@ -116,7 +116,7 @@ def employee(id):
         doc["points"] = point_count
         doc["tree_height"] = str(min(500, 150 + point_count * 50)) + "px"
 
-        doc["water_percentage"] = round(round(120/600, 2)*100)
+        doc["water_percentage"] = round(round(doc["water_consumed"][0]["data"]/8, 2)*100)
         doc["focus_percentage"] = round(round(55/120, 2)*100)
 
         break_duration_len = min(32, len(doc["break_durations"]))
@@ -125,6 +125,10 @@ def employee(id):
         for b in doc["break_durations"][-break_duration_len:]:
             x.append(b["time"])
             y.append(sum(b["data"]))
+
+        doc["min_focused"] = sum(doc["focustimes"][len(doc["focustimes"]) - 1]["data"])
+        doc["min_remaining"] = 15 - doc["min_focused"]
+        doc["min_percentage"] = round(round(doc["min_focused"]/15, 2)*100)
 
         p = figure(plot_width=550, plot_height=300)
 

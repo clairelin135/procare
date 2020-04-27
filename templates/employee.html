@@ -17,10 +17,10 @@
         <div class="tile bg-blue mr1 pa4 flex flex-column items-center">
           <div class="mb4">
             <h2 class="white">Get more water!</h2>
-            <h3 class="white mt2">You've only consumed {{data["water_percentage"]}}% of your daily value.</h3>
+            <h3 class="white mt2">You've consumed {{data["water_percentage"]}}% of your daily value.</h3>
           </div>
           <div class="c100 p{{data['water_percentage']}}">
-            <span><h2>{{data["water_consumed"]}} ml</h2></span>
+            <span><h2>{{data["water_consumed"][0]["data"]}} cups</h2></span>
             <div class="slice">
               <div class="bar"></div>
               <div class="fill"></div>
@@ -30,10 +30,10 @@
         <div class="tile bg-white ml1 pa4 flex flex-column items-center">
           <div class="mb4">
             <h2>Focus Session</h2>
-            <h3 class="mt2">You've been working for a while, take a break in 20 minutes!</h3>
+            <h3 class="mt2">You've been working for a while, take a break in {{data["min_remaining"]}} minutes!</h3>
           </div>
-          <div class="c100 p{{data['focus_percentage']}}">
-            <span><h2>{{data["time_focused"]}} min</h2></span>
+          <div class="c100 p{{data['min_percentage']}}">
+            <span><h2>{{data["min_focused"]}} min</h2></span>
             <div class="slice">
               <div class="bar"></div>
               <div class="fill"></div>
