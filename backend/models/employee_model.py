@@ -1,7 +1,8 @@
 import numpy as np
 import datetime
+from datetime import timedelta
 import random
-
+from stock_data_model import get_market_compare
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
@@ -20,6 +21,7 @@ class Employee:
         self.department = department
         self.team = team
         self.stock_symbol = stock_symbol
+        self.employer_id = 1
         
         # User Input
         self.calories_eaten = []
@@ -71,8 +73,8 @@ class Employee:
         
         
 
-    def get_daily_stats(self):
-        now = datetime.datetime.now()
+    def get_daily_stats(self, time_delta=timedelta(minutes=0)):
+        now = datetime.datetime.now() + time_delta
         self.entrance_time.append({"time":now, "data":np.random.randint(3,11)})
         self.exit_time.append({"time":now, "data":np.random.randint(15,23)})
         self.traffic.append({"time":now, "data":self.traffic_constant[np.random.randint(0, len(self.traffic_constant))]})
@@ -100,19 +102,22 @@ class Employee:
 
 
     
-    def get_api_stats(self):
-        now = datetime.datetime.now()
+    def get_api_stats(self, time_delta=timedelta(minutes=0)):
+        now = datetime.datetime.now() + time_delta
         self.git_push_time_difference.append({"time":now, "data":np.random.randint(5, 15)}) # Supposed to get from Git livetime
         self.heart_rate.append({"time":now, "data":np.random.randint(60,180)})
         self.temperature.append({"time":now, "data":np.random.randint(50, 70)}) # Replace with Weather API
-        self.stock_ytd.append({"time":now, "data":np.random.random() * (-1 * np.random.randint(0,2))})  # Replace this with Yahoo Finance API
+        self.stock_ytd.append({"time":now, "data":get_market_compare(self.stock_symbol)}) 
+        print(self.stock_ytd[-1])
         self.chat_tone.append({"time":now, "data":self.chat_tone_constant[np.random.randint(0, len(self.chat_tone_constant))]})
         self.weather.append({"time":now, "data":self.weather_constant[np.random.randint(0, len(self.weather_constant))]})
         
 
     # This is simulated to run every 15 minutes
-    def run_sensors(self):
-        now = datetime.datetime.now()
+    def run_sensors(self, time_delta=timedelta(minutes=0)):
+        now = datetime.datetime.now() + time_delta
+
+
 
         self.break_durations.append({"time":now, "data": [np.random.randint(0,2) for _ in range(15)]})
         self.focustimes.append({"time":now, "data": [np.random.randint(0,2) for _ in range(15)]})
@@ -130,14 +135,14 @@ class Employee:
 
         firebase_admin
 
-    def run_every_15_mins(self):
-        self.run_sensors()
+    def run_every_15_mins(self, time_delta=timedelta(minutes=0)):
+        self.run_sensors(time_delta)
         self.store_employee_to_firebase()
 
-    def run_every_day(self):
-        self.get_daily_stats()
-        self.run_sensors()
-        self.get_api_stats()
+    def run_every_day(self, time_delta=timedelta(minutes=0)):
+        self.get_daily_stats(time_delta)
+        self.run_sensors(time_delta)
+        self.get_api_stats(time_delta)
         self.store_employee_to_firebase()
 
 
@@ -205,17 +210,18 @@ for user_id in range(100, 150):
             bodyfat=np.random.randint(5,25), 
             height=np.random.randint(140,180), 
             weight=np.random.randint(100,200), 
-            zipcode=np.random.randint(10000,99999), 
+            zipcode=np.random.randint(10001,99999), 
             department=["engineering", "product-management", "sales"][np.random.randint(0,3)], 
             team=["Cloud", "Ads", "Search", "Products", "Corporate"][np.random.randint(0, 5)], 
             stock_symbol="GOOG"
         )
 
-    for i in range(96):
-        e.run_every_15_mins()
+    for i in range(1,97):
+        time_delta = timedelta(minutes=(i*15))
+        e.run_every_15_mins(time_delta)
 
         if i % 96 == 0:
-            e.run_every_day()
+            e.run_every_day(time_delta)
 
 # # -------------------------
 
