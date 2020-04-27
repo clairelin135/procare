@@ -181,7 +181,6 @@ def employer(id):
         'action2-description': 'sign up for meditating',
         'action2-action': 'uhh onclick actions?',
         'action3-name': 'Gym',
-        'action3-description': 'yall fat',
         'action3-action': 'uhh onclick actions?'
     }
 
