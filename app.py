@@ -9,6 +9,9 @@ from bokeh.plotting import figure
 from bokeh.models import DatetimeTickFormatter
 from bokeh.embed import components
 from wtforms import Form, BooleanField
+import requests
+import datetime
+from .backend.models.prediction_retriever import get_state_prediction, get_health_prediction #uncomment before push
 
 # config = {
 #     "apiKey": "AIzaSyBdvsfqF_yfU5uvbu6tJxqAuU_jZQw86DQ",
@@ -20,12 +23,6 @@ from wtforms import Form, BooleanField
 #     "appId": "1:746504989082:web:43f738d1eaa972e1913223",
 #     "measurementId": "G-1SCRZGN73Q"
 # }
-
-# firebase = pyrebase.initialize_app(config)
-# db  = firebase.database()
-# db.child("names").push({
-#     "name": "Elden"
-# })
 
 # Initialize Flask App
 app = Flask(__name__)
@@ -40,90 +37,14 @@ db = firestore.client()
 EMPLOYER_COLLECTION = "employers"
 EMPLOYEE_COLLECTION = "employees"
 NUDGE_COLLECTION = "nudges"
+ACTIONS_COLLECTION = "actions"
 
 EMPLOYER_ROUTE = "/employer/"
 EMPLOYEE_ROUTE = "/employee/"
 
-DEPARTMENTS = ["engineering", "product-management", "sales"]
-
-# given collection, and document, adds an name/age entry into db
-@app.route('/add', methods=['POST'])
-def create_employee():
-    try:
-        body = request.json
-        id = body['id']
-        collection = body['collection']
-        document = body['document']
-        name = body["name"]
-        age = body["age"]
-
-        doc_ref = db.collection(collection).document(document+str(id))
-        doc_ref.set({
-            "name": name,
-            "age": age
-        })
-        return jsonify({"success": True}), 200
-    except Exception as e:
-        return f"An Error Occured: {e}"
-
-# returns the requested
-# json req keys: id, collection, document, field
-@app.route('/list', methods=['GET'])
-def read_employee_info():
-    try:
-        body = request.json
-        id = body['id']
-        collection = body['collection']
-        document = body['document']
-        doc_ref = db.collection(collection).document(document+str(id))
-        doc = doc_ref.get()
-
-        if doc.exists:
-            doc = doc.to_dict()
-            return jsonify({
-                'name': doc['name'],
-                'age': doc['age']
-            })
-    except Exception as e:
-        return f"An Error Occured: {e}"
-
-# updates an employee field
-# json req requires: id, collection, document, field, update
-@app.route('/update', methods=['POST', 'PUT'])
-def update():
-    """
-        update() : Update document in Firestore collection with request body
-        Ensure you pass a custom ID as part of json body in post request
-        e.g. json={'id': '1', 'title': 'Write a blog post today'}
-    """
-    try:
-        body = request.json
-        id = body['id']
-        collection = body['collection']
-        document = body['document']
-        doc_ref = db.collection(collection).document(document+str(id))
-        doc_ref.update({body['field']: body['update']})
-        return jsonify({"success": True}), 200
-    except Exception as e:
-        return f"An Error Occured: {e}"
-
-# delete an employee
-# json requires: id
-@app.route('/delete', methods=['GET'])
-def delete_employee():
-    """
-        delete() : Delete a document from Firestore collection
-    """
-    try:
-        # Check for ID in URL query
-        body = request.json
-        id = body['id']
-        doc_ref = db.collection('employees').document('employee'+str(id))
-        doc_ref.delete()
-
-        return jsonify({"success": True}), 200
-    except Exception as e:
-        return f"An Error Occured: {e}"
+# Useful dictionaries
+db_m = {'1': 'engineering', '2': 'product-management', '3': 'sales'}
+human_m = {'1': 'Engineering', '2': 'Product', '3': 'Sales'}
 
 @app.route('/')
 def index():
@@ -139,19 +60,13 @@ def index():
         }
         employees.append(employee)
     
-    for department in DEPARTMENTS:
-        try:
-            doc = db.collection(EMPLOYER_COLLECTION).document(department).get()
-
-            if doc.exists:
-                doc = doc.to_dict()
-                employer = {
-                    "name": doc["admin_info"]
-                }
-                employers.append(employer)
-                
-        except Exception as e:
-            return f"An Error Occured: {e}"
+    for i in range(1, len(db_m)+1):
+        name = human_m[str(i)]
+        employer = {
+            'name': name,
+            'route': EMPLOYER_ROUTE + str(i)
+        }
+        employers.append(employer)
     
     return render_template("index.html", employees=employees, employers=employers)
 
@@ -160,7 +75,7 @@ def index():
 def employee(id):
     class F(Form):
         pass
-    
+
     # Fetch nudges and add to document
     nudges = []
     point_count = 0
@@ -175,7 +90,7 @@ def employee(id):
             point_count += 1
     for nudge in nudges:
         setattr(F, nudge["id"], BooleanField(label=nudge["nudge_question"]))
-    
+
     if request.method == 'POST':
         form = F(request.form)
         for (key, value) in form.data.items():
@@ -230,23 +145,171 @@ def employee(id):
     else:
         return f"User does not exist"
 
-@app.route(EMPLOYER_ROUTE)
-def employer():
-    # collection = "employers"
-    # document = "2020-04-16"
-    #
-    # doc_ref = db.collection(collection).document(document)
-    # doc = doc_ref.get()
-    #
-    # dunno what the real data will actually
-    doc = {'emotion-percentage': '65%',
-            'product-percentage':'75%',
-            'nutrition-percentage': '85%',
-            'attendance': 300,
-            'late': 10,
-            'absent': 5}
+@app.route(EMPLOYER_ROUTE + '<id>', methods=['GET', 'POST'])
+def employer(id):
+    department = db_m[id]
 
-    return render_template("employer.html", data=doc)
+    emo_p = get_weekly_average(department, "emotional_level")
+    pro_p = get_weekly_average(department, "productivity")
+    phy_p = get_weekly_average(department, "physical_wellness")
+    admin_name = get_attr(department, 'admin_info')
+    attendance = get_attr(department, 'attendance')
+    late = get_attr(department, 'late')
+    absent = get_attr(department, 'absent')
+    percentages = ill_percentages(department) #uncomment before push
+    # percentages = {'depression': 15, 'ct': 25, 'lombago': 20} #comment before push
+    top_illness = None
+    top_perc = 0
+    for k, v in percentages.items():
+        if v > top_perc:
+            top_perc = v
+            top_illness = k
+    if top_illness == 'ct':
+        top_illness_name = 'Carpal Tunnel - Numbness/Tingling of the wrist'
+    elif top_illness == 'depression':
+        top_illness_name = 'Depression'
+    elif top_illness == 'lombago':
+        top_illness_name = 'Lombago - Lower back pain'
+
+    doc = {'emotion-percentage': str(emo_p)+'%',
+            'product-percentage': str(pro_p)+'%',
+            'physical-percentage': str(phy_p)+'%',
+            'attendance': attendance,
+            'late': late,
+            'absent': absent,
+            'admin-name': admin_name,
+            'dep-name': human_m[id],
+            'top-illness': top_illness,
+            'top-illness-name': top_illness_name,
+            'depression': str(percentages['depression'])+'%',
+            'ct': str(percentages['ct'])+'%',
+            'lombago': str(percentages['lombago'])+'%'
+        }
+    depression_actions = {
+        'action1-name': 'Send Nudges',
+        'action1-description': 'ye',
+        'action1-action': 'uhh onclick actions?',
+        'action2-name': 'Meditation',
+        'action2-description': 'sign up for meditating',
+        'action2-action': 'uhh onclick actions?',
+        'action3-name': 'Gym',
+        'action3-description': 'yall fat',
+        'action3-action': 'uhh onclick actions?'
+    }
+
+    actions_doc = db.collection(ACTIONS_COLLECTION).document(doc['top-illness']).get()
+    if actions_doc.exists:
+        actions = actions_doc.to_dict()
+    else:
+        actions = depression_actions
+
+    x = get_x_axis()
+    script_prod, div_prod = create_plot(x, 'productivity')
+    script_em, div_em = create_plot(x, 'emotional_level')
+    script_ph, div_ph = create_plot(x, 'physical_wellness')
+
+    return render_template("employer.html", data=doc, actions=actions, script_prod=script_prod, div_prod=div_prod,
+    script_em=script_em, div_em=div_em, script_ph=script_ph, div_ph=div_ph)
+
+# deparatment: [product-management, engineering, sales]
+# stat: [emotional_level, productivity, physical_wellness]
+def get_weekly_average(department, stat):
+    total = 0
+    day = 21
+    for _ in range(7):
+        date = "2020-04-" + str(day)
+        doc_stream = db.collection(EMPLOYER_COLLECTION).document(date).collection(department).stream()
+        for doc in doc_stream:
+            json_doc = doc.to_dict()
+            p = json_doc[stat]
+            total += p
+            break
+        day -= 1
+    return round((total / 7)  * 100)
+
+def get_attr(department, attr):
+    doc_ref = db.collection(EMPLOYER_COLLECTION).document(department)
+    doc = doc_ref.get().to_dict()
+    return doc[attr]
+
+# retrieves the percentages of depression, ct, and lombago, given department
+def ill_percentages(department):
+    employee_docs = db.collection(EMPLOYEE_COLLECTION).stream()
+    depression = 0
+    ct = 0
+    lombago = 0
+    c = 0
+    for doc in employee_docs:
+        json_doc = doc.to_dict()
+        if json_doc['department'] != department:
+            continue
+        depression += get_state_prediction(json_doc['id'], 'depression')
+        ct += get_state_prediction(json_doc['id'], 'ct')
+        lombago +=  get_state_prediction(json_doc['id'], 'lombago')
+        c += 1
+    print(depression)
+    print(ct)
+    print(lombago)
+    return {'depression': round((depression / c) * 100), 'ct': round((ct / c) * 100), 'lombago': round((lombago / c) * 100)}
+
+# stat: emotional_level, physical_wellness, productivity
+# creates plot for all departments for one stat type
+def create_plot(x, stat):
+    y_axis_label = ""
+    if stat == "productivity":
+        y_axis_label = "Productivity"
+    elif stat == "emotional_level":
+        y_axis_label = "Emotional Wellness"
+    elif stat == "physical_wellness":
+        y_axis_label = "Physical Wellness"
+
+    eng = []
+    pm = []
+    sal = []
+    for date in x:
+        for dept in ['engineering', 'product-management', 'sales']:
+            doc_stream = db.collection(EMPLOYER_COLLECTION).document(date.strftime("%Y-%m-%d")).collection(dept).stream()
+            for doc in doc_stream:
+                json_doc = doc.to_dict()
+                if dept == 'engineering':
+                    eng.append(json_doc[stat])
+                elif dept == 'product-management':
+                    pm.append(json_doc[stat])
+                elif dept == 'sales':
+                    sal.append(json_doc[stat])
+
+    p = figure(x_axis_type="datetime", y_range=(0, 1), plot_width=550, plot_height=300)
+    p.line(x, eng, line_width=2, line_color="#8CCFBB", legend_label="Engineering") #eng is green
+    p.line(x, pm, line_width=2, line_color="#eaadbd", legend_label="Product Management") #pm is pink
+    p.line(x, sal, line_width=2, line_color="#ffa751", legend_label="Sales") #sales is orange
+    p.legend.title = 'Departments'
+    p.legend.location = 'bottom_right'
+    p.legend.click_policy = 'hide'
+    p.toolbar_location = None
+    p.xaxis.axis_label = "Day"
+    p.yaxis.axis_label = y_axis_label
+
+    script, div = components(p)
+
+    return script, div
+
+def get_x_axis():
+    day = 21
+    x = []
+    for _ in range(7):
+        #date = "2020-04-" + str(day)
+        x.insert(0, datetime.datetime(2020, 4, day))
+        day -= 1
+    return x
+
+
+@app.route("/predict", methods=['GET'])
+def predict():
+    body = request.json
+    id = body['id']
+    return jsonify({
+        'p': get_state_prediction(str(id), 'depression')
+    })
 
 # main
 port = int(os.environ.get('PORT', 8080))

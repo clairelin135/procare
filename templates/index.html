@@ -15,14 +15,11 @@
     {% endfor %}
   </div>
   <div class="flex flex-column bg-white pa4 ml2">
-      <h2 class="mb3">EMPLOYERS</h2>
-      <a href="{{ url_for('employer') }}">
-        <h3 class="underline">Employer dashboard</h3>
+    <h2 class="mb3">EMPLOYERS</h2>
+    {% for employer in employers %}
+      <a href="{{employer['route']}}">
+        <h3 class="underline">{{employer['name']}}</h3>
       </a>
-      <br/>
-      {% for employer in employers %}
-        <h3>{{employer['name']}}</h3>
-      {% endfor %}
-    </div>
+    {% endfor %}
 </div>
 {% endblock %}

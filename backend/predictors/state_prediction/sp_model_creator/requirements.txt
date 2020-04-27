@@ -1,0 +1,5 @@
+pandas
+numpy
+sklearn
+google-cloud-storage
+firebase-admin
