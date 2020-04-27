@@ -181,7 +181,6 @@ def employer(id):
         'action2-description': 'sign up for meditating',
         'action2-action': 'uhh onclick actions?',
         'action3-name': 'Gym',
-        'action3-description': 'yall fat',
         'action3-action': 'uhh onclick actions?'
     }
 
@@ -206,7 +205,7 @@ def get_weekly_average(department, stat):
     day = 21
     for _ in range(7):
         date = "2020-04-" + str(day)
-        doc_stream = db.collection(EMPLOYER_COLLECTION).document(date).collection(department).get()
+        doc_stream = db.collection(EMPLOYER_COLLECTION).document(date).collection(department).stream()
         for doc in doc_stream:
             json_doc = doc.to_dict()
             p = json_doc[stat]
@@ -222,7 +221,7 @@ def get_attr(department, attr):
 
 # retrieves the percentages of depression, ct, and lombago, given department
 def ill_percentages(department):
-    employee_docs = db.collection(EMPLOYEE_COLLECTION).get()
+    employee_docs = db.collection(EMPLOYEE_COLLECTION).stream()
     depression = 0
     ct = 0
     lombago = 0
