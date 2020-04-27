@@ -121,3 +121,6 @@ def get_health_prediction(user_id, state_type):
 
     r = requests.get(url, {'message':base64_dict})
     return eval(r.content)
+
+
+print(get_state_prediction(102, "depression"))

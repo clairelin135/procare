@@ -2,7 +2,7 @@
 # coding: utf-8
 
 # In[1]:
-
+from joblib import dump, load
 import pandas as pd
 import numpy as np
 import pickle
@@ -24,12 +24,7 @@ firebase_admin.initialize_app(cred)
 # In[3]:
 
 from sklearn.feature_extraction import DictVectorizer
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegressionCV
-from sklearn.model_selection import train_test_split
-from sklearn.model_selection import StratifiedShuffleSplit
-from sklearn.metrics import accuracy_score
-from sklearn.semi_supervised import LabelPropagation, LabelSpreading
 
 
 # In[4]:
@@ -90,8 +85,8 @@ def build_predictor_model(X, y):
 # In[6]:
 
 def save_predictor_model(model, name):
-    filename = '/tmp/{}.sav'.format(name)
-    pickle.dump(model, open(filename, 'wb'))
+    filename = 'tmp/{}.sav'.format(name)
+    dump(model, open(filename, 'wb'))
     
     bucket_name = "ieor185-274323.appspot.com"
     source_file_name = filename
@@ -109,7 +104,7 @@ def save_predictor_model(model, name):
         )
     )
     
-    os.remove(filename)
+    # os.remove(filename)
 
 
 # In[7]:
@@ -117,15 +112,15 @@ def save_predictor_model(model, name):
 def sanitize_input_data(df):
     X = df.iloc[:,1:-4]
     Y = df.iloc[:,-4:]
-     
+    
     X['weather'] = X['weather'].apply(lambda x: x.lower())
-    X = one_hot_encoding(X, 'gender')
-    X = one_hot_encoding(X, 'weather')
-    X = one_hot_encoding(X, 'average_chat_tone')
+    X['gender'] = X['gender'].apply(lambda x: 1 if x.lower() =='male' else 0)
+    # X = one_hot_encoding(X, 'weather')
+    # X = one_hot_encoding(X, 'average_chat_tone')
     X['traffic condition'] = X['traffic condition'].apply(traffic_condition_processing)
     X['chat-words-depression'], X['chat-words-sad'], X['chat-words-lumbago'] = X['chat-words'].apply(lambda x: chat_words_processing(x, "depression")), X['chat-words'].apply(lambda x: chat_words_processing(x, "sad")), X['chat-words'].apply(lambda x: chat_words_processing(x, "lumbago"))
-    X = X.drop(columns=["stock_ticker", "chat-words"])
-    
+    X = X.drop(columns=["stock_ticker", "chat-words", "weather", "average_chat_tone"])
+    print(X.columns)
     return X, Y
     
 
@@ -137,21 +132,25 @@ def create_models(df):
     
     # Dataset - Depression
     X_depression, y_depression = X.copy(), Y.iloc[:,0]
+    y_depression = y_depression.apply(lambda x: 1 if x > 0.5 else 0)
     depression_model = build_predictor_model(X_depression, y_depression)
     save_predictor_model(depression_model, "depression")
     
     # Dataset - SAD
     X_sad, y_sad = X.copy(), Y.iloc[:,1]
+    y_sad = y_depression.apply(lambda x: 1 if x > 0.5 else 0)
     sad_model = build_predictor_model(X_sad, y_sad)
     save_predictor_model(depression_model, "sad")
     
     # Dataset - Lombago
     X_lombago, y_lombago = X.copy(), Y.iloc[:,2]
+    y_lombago = y_depression.apply(lambda x: 1 if x > 0.5 else 0)
     lombago_model = build_predictor_model(X_lombago, y_lombago)
     save_predictor_model(depression_model, "lombago")
     
     # Dataset - Carpal Tunnel
     X_ct, y_ct = X.copy(), Y.iloc[:,3]
+    y_ct = y_ct.apply(lambda x: 1 if x > 0.5 else 0)
     ct_model = build_predictor_model(X_ct, y_ct)
     save_predictor_model(depression_model, "ct")
 
@@ -186,4 +185,4 @@ def main(request):
     df = load_input_firebase()
     create_models(df)
 
-
+main("")

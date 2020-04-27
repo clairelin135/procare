@@ -50,27 +50,27 @@ def get_user_data_for_health_prediction(db, user_id):
     employee_data = get_employee_data(user_id, db)
 
     predictor_data = {
-        'ID':1, 
-        'age':21, 
-        'gender':"male", 
-        'weight':190, 
-        'num_task_pending':0,
-        'average_task_completion_delay':5, 
-        'avg_sleep':8, 
-        'calories_eaten':2000,
-        'water_drank':10, 
-        'lunch_cafeteria_or_other':'c', 
-        'percent_work_done_in_teams':"10%",
-        'public_transit_commute':"n", 
-        'entry time':9, 
-        'exit time':6, 
-        'hours':8, 
-        'height':168,
-        'num_breaks':10, 
+        'ID' : employee_data["id"],
+        'age' : employee_data["age"],
+        'gender' : employee_data["gender"],
+        'weight' : employee_data["weight"],
+        'num_task_pending':employee_data["num_task_pendings"][-1]["data"],
+        'average_task_completion_delay':employee_data["avg_task_delay"][-1]["data"], 
+        'avg_sleep':employee_data["sleep"][-1]["data"], 
+        'calories_eaten':employee_data["calories_eaten"][-1]["data"],
+        'water_drank':employee_data["water_consumed"][-1]["data"], 
+        'lunch_cafeteria_or_other':employee_data["lunch_cafeteria_or_other"][-1]["data"], 
+        'percent_work_done_in_teams':employee_data["percent_work_done_in_teams"][-1]["data"],
+        'public_transit_commute':employee_data["public_transit_commute"][-1]["data"], 
+        'entry time':employee_data["entrance_time"][-1]["data"], 
+        'exit time':employee_data["exit_time"][-1]["data"], 
+        'hours':employee_data["exit_time"][-1]["data"] - employee_data["entrance_time"][-1]["data"], 
+        'height':employee_data["height"],
+        'num_breaks':np.random.randint(0,25), 
         'season':"spring", 
         'location':"SF", 
-        'has_roommates':"n", 
-        'num_laundry':"0",
+        'has_roommates':employee_data["roommates"], 
+        'num_laundry':employee_data["num_laundry"][-1]["data"],
     }
 
     return predictor_data
@@ -97,3 +97,6 @@ def main(request):
         return run_health_pipeline(user_id)
 
     return f'Error In Parameter'
+
+for i in range(101, 111):
+    run_health_pipeline(i)

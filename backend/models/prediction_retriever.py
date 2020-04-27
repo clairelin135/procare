@@ -121,3 +121,28 @@ def get_health_prediction(user_id, state_type):
 
     r = requests.get(url, {'message':base64_dict})
     return eval(r.content)
+
+
+from firebase_admin import credentials, firestore, initialize_app
+cred = credentials.Certificate('key.json')
+default_app = initialize_app(cred)
+db = firestore.client()
+
+employee_docs = db.collection("employees").get()
+depression = 0
+ct = 0
+lombago = 0
+c = 0
+for doc in employee_docs:
+    json_doc = doc.to_dict()
+    if json_doc['department'] != "engineering":
+        continue
+    depression += get_health_prediction(json_doc['id'], 'cough')
+    ct += get_health_prediction(json_doc['id'], 'allergy')
+    lombago +=  get_health_prediction(json_doc['id'], 'fever')
+
+    print(depression, ct, lombago)
+
+
+    c += 1
+print({'depression': round((depression / c) * 100), 'ct': round((ct / c) * 100), 'lombago': round((lombago / c) * 100)})
