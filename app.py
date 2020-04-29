@@ -84,7 +84,7 @@ def employee(id):
         form = F(request.form)
         for (key, value) in form.data.items():
             try:
-                doc_ref = db.collection(NUDGE_COLLECTION + "-1").document(key)
+                doc_ref = db.collection(NUDGE_COLLECTION + '-' + str(id)).document(key)
                 doc_ref.update({
                     "sent": value,
                     "responded": True
